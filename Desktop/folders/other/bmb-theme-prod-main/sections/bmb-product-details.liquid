@@ -1,0 +1,240 @@
+{%- comment -%}BMB Product Details Section{%- endcomment -%}
+{{ 'bmb-product-page.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}Debug Toggle - Set to true to show debug info{%- endcomment -%}
+{%- assign debug_mode = false -%}
+
+<div class="bmb-product-details-container">
+  {%- comment -%}Product Tabs{%- endcomment -%}
+  <div class="bmb-product-tabs">
+    <div class="bmb-tab-nav">
+      <button class="bmb-tab-button active" data-tab="description">Description</button>
+      <button class="bmb-tab-button" data-tab="dimensions">Dimensions</button>
+      <button class="bmb-tab-button" data-tab="art-info">Art Info</button>
+    </div>
+
+    {%- comment -%}Description Tab{%- endcomment -%}
+    <div class="bmb-tab-content active" id="description-tab">
+      <div class="bmb-product-description">
+        {{ product.description }}
+      </div>
+      
+      {%- if debug_mode -%}
+        {%- comment -%}Debug metafields{%- endcomment -%}
+        <div style="background: #f0f0f0; padding: 1rem; margin: 1rem 0; font-size: 0.8rem;">
+          <strong>Debug - JSON Parsing Test:</strong><br><br>
+          
+          <strong>Price Breaks:</strong><br>
+          Raw: {{ product.metafields.custom.price_breaks }}<br>
+          {%- assign price_data = product.metafields.custom.price_breaks | parse_json -%}
+          Parsed: {{ price_data }}<br>
+          Type: {{ price_data | class }}<br>
+          Has breaks?: {{ price_data.breaks }}<br>
+          First break: {{ price_data.breaks[0] }}<br>
+          First break price: {{ price_data.breaks[0].price }}<br><br>
+          
+          <strong>Key Features:</strong><br>
+          Raw: {{ product.metafields.custom.key_features }}<br>
+          {%- assign features_data = product.metafields.custom.key_features | parse_json -%}
+          Parsed: {{ features_data }}<br>
+          Features array: {{ features_data.features }}<br>
+          First feature: {{ features_data.features[0] }}<br><br>
+          
+          <strong>Product Specs:</strong><br>
+          Raw: {{ product.metafields.custom.product_specs }}<br>
+          {%- assign product_data = product.metafields.custom.product_specs | parse_json -%}
+          Parsed: {{ product_data }}<br>
+          Capacity: {{ product_data.capacity_oz }}<br>
+          Dimensions: {{ product_data.dimensions }}<br>
+          Length: {{ product_data.dimensions.length }}<br><br>
+          
+          <strong>Imprint Specs:</strong><br>
+          Raw: {{ product.metafields.custom.imprint_specifications }}<br>
+          {%- assign imprint_data = product.metafields.custom.imprint_specifications | parse_json -%}
+          Parsed: {{ imprint_data }}<br>
+          Methods: {{ imprint_data.methods }}<br>
+          
+          <strong>Alternative parsing attempts:</strong><br>
+          Price breaks value type: {{ product.metafields.custom.price_breaks.value }}<br>
+          Price breaks as object: {{ product.metafields.custom.price_breaks | json }}<br><br>
+          
+          <strong>Direct access test (without parsing):</strong><br>
+          Direct access to breaks: {{ product.metafields.custom.price_breaks.breaks }}<br>
+          Direct access to features: {{ product.metafields.custom.key_features.features }}<br>
+          
+          <strong>Metafield objects:</strong><br>
+          Price breaks metafield: {{ product.metafields.custom.price_breaks }}<br>
+          Key features metafield: {{ product.metafields.custom.key_features }}<br>
+        </div>
+      {%- endif -%}
+
+      {%- if product.metafields.custom.key_features -%}
+        {%- assign features_data = product.metafields.custom.key_features.value -%}
+        <div class="bmb-key-features">
+          <h3>Key Features:</h3>
+          <ul class="bmb-features-list">
+            {%- for feature in features_data.features -%}
+              <li>{{ feature }}</li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}Dimensions Tab{%- endcomment -%}
+    <div class="bmb-tab-content" id="dimensions-tab">
+      <div class="bmb-dimensions-grid">
+        {%- comment -%}Product Dimensions{%- endcomment -%}
+        {%- if product.metafields.custom.product_specs -%}
+          {%- assign product_data = product.metafields.custom.product_specs.value -%}
+          <div class="bmb-dimension-table">
+            <h4>Product Dimensions</h4>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Capacity</span>
+              <span class="bmb-dimension-value">{{ product_data.capacity_oz }} oz.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Length</span>
+              <span class="bmb-dimension-value">{{ product_data.dimensions.length }} in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Width</span>
+              <span class="bmb-dimension-value">{{ product_data.dimensions.width }} in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Height</span>
+              <span class="bmb-dimension-value">{{ product_data.dimensions.height }} in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Top Diameter</span>
+              <span class="bmb-dimension-value">{{ product_data.dimensions.top_diameter }} in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Bottom Diameter</span>
+              <span class="bmb-dimension-value">{{ product_data.dimensions.bottom_diameter }} in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Weight</span>
+              <span class="bmb-dimension-value">{{ product_data.weight_lbs }} lbs.</span>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- comment -%}Case Dimensions{%- endcomment -%}
+        {%- if product.metafields.custom.case_shipping_specs -%}
+          {%- assign case_data = product.metafields.custom.case_shipping_specs.value -%}
+          <div class="bmb-dimension-table">
+            <h4>Case Dimensions</h4>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Quantity</span>
+              <span class="bmb-dimension-value">{{ case_data.items_per_case }} pcs.</span>
+            </div>
+            {%- if case_data.case_dimensions.length -%}
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Length</span>
+              <span class="bmb-dimension-value">{{ case_data.case_dimensions.length }} in.</span>
+            </div>
+            {%- endif -%}
+            {%- if case_data.case_dimensions.width -%}
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Width</span>
+              <span class="bmb-dimension-value">{{ case_data.case_dimensions.width }} in.</span>
+            </div>
+            {%- endif -%}
+            {%- if case_data.case_dimensions.height -%}
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Height</span>
+              <span class="bmb-dimension-value">{{ case_data.case_dimensions.height }} in.</span>
+            </div>
+            {%- endif -%}
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Weight</span>
+              <span class="bmb-dimension-value">{{ case_data.case_weight_lbs }} lbs.</span>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- comment -%}Pallet Dimensions{%- endcomment -%}
+        {%- if product.metafields.custom.case_shipping_specs -%}
+          {%- assign case_data = product.metafields.custom.case_shipping_specs.value -%}
+          {%- if case_data.pallet_quantity -%}
+          <div class="bmb-dimension-table">
+            <h4>Pallet Dimensions</h4>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Quantity</span>
+              <span class="bmb-dimension-value">{{ case_data.pallet_quantity }} pcs.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Length</span>
+              <span class="bmb-dimension-value">36 in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Width</span>
+              <span class="bmb-dimension-value">36 in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Height</span>
+              <span class="bmb-dimension-value">72 in.</span>
+            </div>
+            <div class="bmb-dimension-row">
+              <span class="bmb-dimension-label">Weight</span>
+              <span class="bmb-dimension-value">600 lbs.</span>
+            </div>
+          </div>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%}Art Info Tab{%- endcomment -%}
+    <div class="bmb-tab-content" id="art-info-tab">
+      <div class="bmb-art-info-grid">
+        {%- if product.metafields.custom.imprint_specifications -%}
+          {%- assign imprint_data = product.metafields.custom.imprint_specifications.value -%}
+          {%- for method in imprint_data.methods -%}
+            <div class="bmb-imprint-dimension-card">
+              <h4>{{ method[0] | replace: '_', ' ' | replace: '-', ' ' | capitalize }} Dimensions</h4>
+              <div class="bmb-imprint-locations">
+                {%- for location in method[1].locations -%}
+                  <div class="bmb-imprint-location">
+                    <span>{{ location.name }}</span>
+                    <span>{{ location.width }}" W x {{ location.height }}" H</span>
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+      
+      <p style="margin-top: 2rem; text-align: center; color: #666; font-size: 0.875rem;">
+        Art disclaimer information. Art disclaimer information. Art disclaimer information. Art disclaimer information. Art disclaimer information. Art disclaimer information. Art disclaimer information. Art disclaimer information. Art disclaimer information. Art disclaimer information.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab navigation for BMB product details
+    document.querySelectorAll('.bmb-tab-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const targetTab = this.dataset.tab;
+        
+        // Update active states
+        document.querySelectorAll('.bmb-tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.bmb-tab-content').forEach(c => c.classList.remove('active'));
+        
+        this.classList.add('active');
+        document.getElementById(targetTab + '-tab').classList.add('active');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "BMB Product Details",
+  "settings": []
+}
+{% endschema %}

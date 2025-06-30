@@ -1,0 +1,38 @@
+<footer class="footer">
+        {{ "//ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js" | script_tag }}
+        {% if section.settings.artifi_footer_enable %}
+                {% if customer %}
+                  <script>
+                    jQuery.get("/cart.js").complete(function (data) {
+                      var responseObject = JSON.parse(data.responseText);
+                      var updatedUserId = jQuery("#artifiUserId").val();
+                      var personalize_url = artifi_integration_url + "/Designer/Services/UpdateUserId?newUserId=" + updatedUserId + "&oldUserId=" + responseObject.token + "&websiteId=" + website_id + "&webApiClientKey=" + webapi_client_key;
+                      var cartToken = responseObject.token;
+                      jQuery.ajax({
+                        type: "GET",
+                        url: personalize_url,
+                        success: function (data) {
+                          
+                        }
+                      });
+                 
+                    });
+                  </script>
+                {% endif %}
+                <input type="hidden" name="artifiUserId" id="artifiUserId" value="{{ customer.id }}"/>
+                {% endif %}
+      </footer>  
+
+      {% schema %}
+      {
+      "name": "Artifi Footer",
+      "settings": [
+        {
+        "type": "checkbox",
+        "id": "artifi_footer_enable",
+        "label": "Enable Artifi Footer",
+        "default": true
+        }
+       ]
+      }
+      {% endschema %}

@@ -1,0 +1,59 @@
+{% if section.settings.artifi_header_enable %}
+    <script type="text/javascript">
+        var website_id = {{ section.settings.artifi_website_id }};
+        var webapi_client_key = "{{ section.settings.artifi_client_key }}";
+        var text_cart_button ="Add to Cart";
+        var artifi_integration_url = "{{ section.settings.artifi_integration_url }}";
+        var save_pdf_link = "1";
+        var save_xml_link = "1";
+        var shop = "7qjcwn-1u.myshopify.com";
+    </script>        
+    {% if template.name == "product" or template.name == "cart" or template.name == "order" or page_title == "Personalize" %}
+         <script src="{{ section.settings.artifi_integration_url }}/Script/Sasintegration/Artifiintegration.js"></script>
+        {{ "artifi.css" | asset_url | stylesheet_tag }}
+        <style> {{ section.settings.artifi_custom_css }} </style>
+        <script src="{{ "artifi.js" | asset_url }}"></script>
+    {% endif %}
+    {% endif %}
+    
+    {% schema %}
+    {
+    "name": "Artifi Header",
+    "settings": [
+    {
+    "type": "checkbox",
+    "id": "artifi_header_enable",
+    "label": "Enable Artifi Header",
+    "default": true
+    },
+    {
+    "type": "header",
+    "content": "Content"
+    },
+    {
+    "type": "text",
+    "id": "artifi_website_id",
+    "label": "Website Id",
+    "default": "000"
+    },
+    {
+    "type": "text",
+    "id": "artifi_client_key",
+    "label": "Web API Client Key",
+    "default": "000"
+    },
+    {
+    "type": "text",
+    "id": "artifi_integration_url",
+    "label": "Artifi Instance URL",
+    "default": "000"
+    },
+    {
+        "type": "textarea",
+        "id": "artifi_custom_css",
+        "label": "Artifi Custom CSS",
+        "default": "#artifiIframeContainer {height: 693px;}.page-width--narrow{max-width: 121.6rem;}"
+      }
+    ]
+    }
+    {% endschema %}

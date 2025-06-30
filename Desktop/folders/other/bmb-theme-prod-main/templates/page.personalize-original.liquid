@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+      <title>Bretsky</title>
+      <script src="https://component.artifi.net/artifi-headless-releases/3.0/Artifi.headless-layout-bretsky.js"></script>
+      <link rel="stylesheet" href="styles.css">
+      <style>
+          /* Initially hide the div */
+          #artifi-imprint-color-container {
+            display: none;
+          }
+          
+          /* Add loading state for add to cart button */
+          .add-to-cart-btn.loading {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          
+          .add-to-cart-btn.loading::after {
+            content: " Loading...";
+          }
+          
+          /* Bulk Pricing Modal Styles */
+          .bulk-pricing-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+          }
+          
+          .bulk-pricing-modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+          }
+          
+          .bulk-pricing-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+          }
+          
+          .bulk-pricing-close:hover,
+          .bulk-pricing-close:focus {
+            color: black;
+            text-decoration: none;
+          }
+          
+          .quantity-selector {
+            margin: 20px 0;
+          }
+          
+          .quantity-input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+          }
+          
+          .quantity-buttons {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+          }
+          
+          .quantity-btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+          }
+          
+          .quantity-btn:hover {
+            background: #005a87;
+          }
+          
+          .quantity-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+          }
+          
+          .pricing-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+          }
+          
+          .pricing-tier {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+          }
+          
+          .pricing-tier.active {
+            background: #e3f2fd;
+            font-weight: bold;
+          }
+          
+          .current-pricing {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007cba;
+            margin: 10px 0;
+          }
+          
+          .add-to-cart-modal-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 15px;
+          }
+          
+          .add-to-cart-modal-btn:hover {
+            background: #218838;
+          }
+          
+          .add-to-cart-modal-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+          }
+      </style>
+    </head>
+    
+    <body class="artifi-body-wrapper">
+        <div class="wrapper">
+          <div class="cart-row">
+            <button
+              class="add-to-cart-btn"
+              onclick="addToCartDesignHnd()"
+              title="Add to Cart"
+              id="AddToCart"
+            >
+              Add to Cart
+            </button>
+          </div>
+          <div class="main-container">
+            <div class="tab">
+              <button
+                class="tablinks"
+                onclick="openIframe(event, 'artifi-upload-user-image-tab')"
+                id="uploadTab"
+              >
+                <div>
+                  <svg
+                    version="1.1"
+                    id="Layer_1"
+                    x="0px"
+                    y="0px"
+                    viewBox="0 0 45 45"
+                    style="enable-background: new 0 0 45 45"
+                    xml:space="preserve"
+                    width="40"
+                    height="40"
+                  >
+                    <style type="text/css">
+                      .st0 {
+                        fill: #53575a;
+                      }
+    
+                      .st1 {
+                        fill: #53575a;
+                        fill-opacity: 0;
+                        stroke: #53575a;
+                        stroke-width: 2;
+                        stroke-linejoin: round;
+                      }
+                    </style>
+                    <g id="upload">
+                      <path
+                        id="arrow"
+                        class="st0"
+                        d="M18.6,36.7h8v-9.9H31l-8.3-9.3l-8.3,9.3h4.3L18.6,36.7z"
+                      />
+                      <path
+                        id="cloud"
+                        class="st1"
+                        d="M9.6,37h26.7c0,0,7-2.7,7-9.5c0,0,0-8.1-7-8.3c0,0-3-8.3-10.2-5.1c0,0-2.9-6.4-11.4-3.2
+            c0,0-5.2,2.1-5.1,7c0,0-7.6,0.3-7.6,8.3C2,26.1,2,35.8,9.6,37z"
+                      />
+                    </g>
+                  </svg>
+                </div>
+                Upload
+              </button>
+              <button
+                class="tablinks"
+                id="my-gallery-btn"
+                onclick="openIframe(event, 'artifi-my-gallery')"
+              >
+                <div>
+                  <svg width="40" height="40" viewBox="0 0 39 33">
+                    <defs>
+                      <clipPath id="clip-gallery_resized_gray">
+                        <rect width="39" height="33" />
+                      </clipPath>
+                    </defs>
+                    <g
+                      id="gallery_resized_gray"
+                      data-name="gallery resized gray"
+                      clip-path="url(#clip-gallery_resized_gray)"
+                    >
+                      <g
+                        id="gallery_-_gray"
+                        data-name="gallery - gray"
+                        transform="translate(1 1.167)"
+                      >
+                        <path
+                          id="Path_4"
+                          data-name="Path 4"
+                          d="M704.794,756.45h25.582a.725.725,0,0,1,.724.724v21.247a.724.724,0,0,1-.724.724H704.794a.724.724,0,0,1-.724-.724V757.174A.725.725,0,0,1,704.794,756.45Zm20.568,3.411a1.824,1.824,0,1,0,1.824,1.824A1.824,1.824,0,0,0,725.362,759.861Zm-19.841,12.362,9.221-9.6,4.418,6.459,3.909-3.824,6.584,9.773V757.9H705.522Z"
+                          transform="translate(-694.175 -747.813)"
+                          fill="#53575a"
+                        />
+                        <path
+                          id="Path_5"
+                          data-name="Path 5"
+                          d="M361.692,465.1,386,457.141a.723.723,0,0,1,.911.464l2.331,7.115h-1.521l-1.959-5.982-22.937,7.514,6.163,18.816,1.163-.381v1.521l-1.4.46a.724.724,0,0,1-.911-.464l-6.613-20.191A.723.723,0,0,1,361.692,465.1Z"
+                          transform="translate(-361.191 -457.105)"
+                          fill="#53575a"
+                        />
+                      </g>
+                    </g>
+                  </svg>
+                </div>
+                My Gallery
+              </button>
+            </div>
+    
+            <div id="show-preview"></div>
+    
+            <div class="product-control">
+              <div
+                id="artifi-upload-user-image"
+                data-selector="artifi-upload-user-image"
+                data-image-id="image_1"
+              ></div>
+              <div
+                id="artifi-upload-user-image-tab"
+                class="my-2 tabview visible"
+                data-image-id="image_1"
+              >
+                <div id="artifi-design-updated"></div>
+                <h4 class="panel-heading">Upload Your Artwork</h4>
+                <div id="artifi-upload-container">
+                  <div id="artifi-image-upload-drag-image"></div>
+                  <div class="separates">OR</div>
+                  <div id="artifi-image-upload-browse-image"></div>
+                  <div
+                    id="artifi-image-upload-image-extensions"
+                    class="file-extension"
+                  ></div>
+                  <div id="artifi-image-upload-image-size" class="file-size"></div>
+                </div>
+                <div id="artifi-imprint-color-container">
+                  <!-- <title class="remove-background">Background</title> -->
+                  <div id="artifi-remove-all-white"></div>
+                  <div
+                    id="artifi-graphic-color"
+                    data-page-size="50"
+                    data-image-id="image_1"
+                  ></div>
+                  <div
+                    id="artifi-imprint-color"
+                    class="imprint-color"
+                    data-shape-type="square"
+                  ></div>
+                  <div
+                    id="artifi-graphic-color"
+                    data-page-size="50"
+                    data-image-id="image_1"
+                  ></div>
+                  <div id="artifi-remove-all-white"></div>
+                  <div id="artifi-image-color-detector"></div>
+                </div>
+              </div>
+              <div
+                id="artifi-my-gallery"
+                class="my-2 tabview"
+                data-image-id="image_1"
+                data-view-code=""
+                data-add-widget=""
+                data-delete-option="false"
+              >
+                <h4 class="panel-heading">My Gallery</h4>
+              </div>
+              <div id="artifi-text-area" class="my-2 tabview" data-text-id="text_1">
+                <h4 class="panel-heading" id="edit-text-heading">Edit Text</h4>
+              </div>
+              <div class="text-family-and-size">
+                <div
+                  id="artifi-text-family"
+                  class="text-font-family-dropdown"
+                ></div>
+                <div id="artifi-text-size" class="font-dropdown"></div>
+              </div>
+              <div id="artifi-text-color" data-page-size="50"></div>
+    
+              <div
+                id="artifi-clipart-families"
+                class="my-2 tabview"
+                data-image-id="image_1"
+                data-view-code=""
+                data-add-widget=""
+                data-clipart-families-visible="true"
+              >
+                <h4 class="panel-heading">Add Icon</h4>
+              </div>
+              <div id="artifi-request-proof" class="my-2 tabview">
+                <h4 class="panel-heading">Request Proof</h4>
+              </div>
+            </div>
+            <div class="product-canvas">
+              <div id="artifi-zoom" data-zoom-position=""></div>
+              <div
+                id="artifi-editor"
+                data-is-getimage=""
+                data-show-delete-widget-confirmation="true"
+              ></div>
+              <div
+                id="artifi-product-views"
+                class="product-view-container"
+                data-carousal-type="scroll"
+                data-carousel-direction="horizontal"
+              ></div>
+            </div>
+            <div id="artifi"></div>
+          </div>
+        </div>
+        
+        <!-- Bulk Pricing Modal -->
+        <div id="bulkPricingModal" class="bulk-pricing-modal">
+          <div class="bulk-pricing-modal-content">
+            <span class="bulk-pricing-close">&times;</span>
+            <h2>Select Quantity</h2>
+            <p>Choose your quantity to see bulk pricing discounts:</p>
+            
+            <div class="quantity-selector">
+              <label for="quantityInput">Quantity:</label>
+              <div class="quantity-buttons">
+                <button type="button" class="quantity-btn" id="decreaseQty">-</button>
+                <input type="number" id="quantityInput" class="quantity-input" value="1" min="1">
+                <button type="button" class="quantity-btn" id="increaseQty">+</button>
+              </div>
+            </div>
+            
+            <div class="pricing-info">
+              <h3>Pricing Tiers</h3>
+              <div id="pricingTiers"></div>
+              <div class="current-pricing">
+                <div>Unit Price: $<span id="currentUnitPrice">0.00</span></div>
+                <div>Total: $<span id="currentTotalPrice">0.00</span></div>
+              </div>
+            </div>
+            
+            <button type="button" class="add-to-cart-modal-btn" id="confirmAddToCart">
+              Add to Cart - <span id="modalQuantity">1</span> item(s)
+            </button>
+          </div>
+        </div>
+      <script>
+    
+        window.onload = () => {
+    
+          // Get the current URL
+          const url = new URL(window.location.href);
+    
+          // Access the search parameters
+          const searchParams = new URLSearchParams(url.search);
+    
+          // Get URL parameters with fallback to hardcoded values
+          const webApiClientKey = searchParams.get('webApiClientKey') || "7553b364-fca5-4c72-bad7-4d96902c987f";
+          const websiteId = searchParams.get('websiteId') || "374";
+          const userId = searchParams.get('userId') || "12";
+          const isGuest = searchParams.get('isGuest') || "false";
+          const sku = searchParams.get('sku');
+          const designId = searchParams.get('designId') || "";
+          const clientCode = searchParams.get('clientCode') || "";
+          const widgetData = searchParams.get('widgetData') || "";
+          const extraDetails = {
+            "clientCode": clientCode ? clientCode : "",
+          };
+          const appMode = searchParams.get('appMode');
+          const decorationMethod = searchParams.get('decorationMethod');
+          
+          // TESTING: Get imprint method and variant ID from URL for easy testing
+          const testVariantId = searchParams.get('variant_id');
+          const testImprintMethod = searchParams.get('imprint_method') || 'screen_print';
+          
+          console.log('URL Test Parameters:', {
+            testVariantId,
+            testImprintMethod,
+            sku,
+            decorationMethod
+          });
+          
+          Artifi.initialize({
+            webApiClientKey: webApiClientKey,
+            websiteId: websiteId,
+            userId: userId,
+            isGuest: isGuest,
+            sku: sku,
+            designId: designId,
+            extraDetails: extraDetails,
+            appMode: appMode,
+            decorationMethod: decorationMethod ? decorationMethod : "",
+          });
+          
+          const firstTab = document.querySelector(".tablinks");
+          firstTab.classList.add("active");
+          openIframe({ currentTarget: firstTab }, "artifi-upload-user-image-tab");
+        };
+    
+        window.addEventListener("artifi-initialized", function (e) {
+          console.log("artifi-initialized", e.detail.data);
+        });
+    
+        window.addEventListener("artifi-launching-error", function (e) {
+          console.log("artifi-launching-error", e.detail.data);
+        });
+    
+        window.addEventListener("artifi-design-updated", function (e) {
+          console.log("artifi-design-updated", e.detail.data);
+        });
+    
+        window.addEventListener("artifi-sku-changed", function (e) {
+          console.log("sku changed", e.detail);
+        });
+    
+        window.addEventListener("artifi-widget-added", function (e) {
+          const imprintColorContainer = document.getElementById(
+            "artifi-imprint-color-container"
+          );
+          imprintColorContainer.style.display = "block";
+          const uploadContainer = document.getElementById(
+            "artifi-upload-container"
+          );
+          uploadContainer.style.display = "none";
+          console.log("artifi-widget-added", e.detail.data);
+        });
+    
+        window.addEventListener("artifi-widget-updated", function (e) {
+          console.log("artifi-widget-updated", e.detail.data);
+        });
+    
+        window.addEventListener("artifi-view-changed", function (e) {
+          console.log("artifi-view-changed", e.detail.data);
+        });
+    
+        // Enhanced Add to Cart Event Handlers
+        window.addEventListener("artifi-add-to-cart-initialize", function (e) {
+          console.log("artifi-add-to-cart-initialize", e.detail.data);
+          
+          // Prevent Artifi's default cart behavior
+          e.preventDefault();
+          
+          // Show loading state on button
+          const AddToCart = document.getElementById('AddToCart');
+          AddToCart.classList.add('loading');
+          AddToCart.disabled = true;
+          
+          // Handle bulk pricing workflow
+          console.log("workflow starts here")
+          handleBulkPricingWorkflow(e.detail.data);
+        });
+    
+        window.addEventListener("artifi-add-to-cart-success", function (e) {
+          console.log("artifi-add-to-cart-success", e.detail.data);
+          
+          // Remove loading state
+          const AddToCart = document.getElementById('AddToCart');
+          AddToCart.classList.remove('loading');
+          AddToCart.disabled = false;
+          
+          // Handle the successful response from Artifi
+          handleArtifiCartSuccess(e.detail.data);
+        });
+    
+        window.addEventListener("artifi-add-to-cart-error", function (e) {
+          console.log("artifi-add-to-cart-error", e.detail.data.message);
+          
+          // Remove loading state
+          const AddToCart = document.getElementById('AddToCart');
+          AddToCart.classList.remove('loading');
+          AddToCart.disabled = false;
+          
+          // Show error message
+          alert('Error adding to cart: ' + e.detail.data.message);
+        });
+    
+        window.addEventListener("artifi-convert-to-single-color", function (e) {
+          console.log("artifi-convert-to-single-color", e.detail.data);
+        });
+    
+        window.addEventListener("artifi-widget-deselected", function (e) {
+          console.log("artifi-widget-deselected", e.detail.data);
+    
+          const firstTab = document.querySelector(".tablinks");
+          firstTab.classList.add("active");
+    
+          const tabviews = document.getElementsByClassName("tabview");
+    
+          Array.from(tabviews).forEach((tabview) => {
+            tabview.style.display = "none";
+          });
+          
+          document.getElementById("artifi-upload-container").style.display =
+            "block";
+          document.getElementById("artifi-upload-user-image-tab").style.display =
+            "block";
+          document.getElementById(
+            "artifi-imprint-color-container"
+          ).style.display = "none";
+    
+          document.getElementById("text-area-btn")?.classList?.remove("active");
+          document.getElementById("edit-text-heading").style.display = "none";
+        });
+    
+        function handleWidgetEvent(e) {
+          console.log(e.type, e.detail.data);
+    
+          if (e?.detail?.data) {
+            let parsedData;
+            try {
+              parsedData = JSON.parse(e.detail.data);
+            } catch (error) {
+              console.error("Invalid JSON data:", e.detail.data);
+              parsedData = {};
+            }
+    
+            if (parsedData && parsedData?.type === "textbox") {
+              openIframeOnWidgetSelect("artifi-text-area");
+              document.getElementById("text-area-btn")?.classList?.add("active");
+            } else if (parsedData?.type === "image") {
+              if (
+                parsedData?.libProp?.ClipartId == null &&
+                parsedData?.libProp?.photoId == null
+              )
+                return;
+              openIframeOnWidgetSelect("artifi-upload-user-image-tab");
+              document.getElementById("artifi-upload-container").style.display =
+                "none";
+              document.getElementById(
+                "artifi-imprint-color-container"
+              ).style.display = "block";
+              document.getElementById("uploadTab").classList.add("active");
+            } else {
+              openIframeOnWidgetSelect("artifi-upload-user-image-tab");
+              document.getElementById("artifi-upload-container").style.display =
+                "block";
+              document.getElementById(
+                "artifi-imprint-color-container"
+              ).style.display = "none";
+              document.getElementById("uploadTab").classList.add("active");
+            }
+          }
+        }
+    
+        window.addEventListener("artifi-widget-selected", handleWidgetEvent);
+        window.addEventListener("artifi-widget-updated", handleWidgetEvent);
+    
+        window.addEventListener("artifi-design-applied", function (e) {
+          console.log("artifi-design-applied");
+        });
+    
+        // Function to handle successful Artifi response and add to Shopify cart
+        function handleArtifiCartSuccess(artifiData) {
+          // Parse the Artifi response data
+          let customizedProductData;
+          try {
+            customizedProductData = typeof artifiData === 'string' ? JSON.parse(artifiData) : artifiData;
+          } catch (error) {
+            console.error('Error parsing Artifi cart data:', error);
+            alert('Error processing customized product data');
+            return;
+          }
+    
+          console.log('Customized product data:', customizedProductData);
+    
+          // Extract necessary information for Shopify
+          const shopifyCartData = {
+            items: [{
+              id: getShopifyVariantId(), // You'll need to implement this
+              quantity: 1,
+              properties: {
+                // Add Artifi customization data as line item properties
+                '_artifi_design_id': customizedProductData.designId || '',
+                '_artifi_sku': customizedProductData.sku || '',
+                '_artifi_customization_data': JSON.stringify(customizedProductData),
+                // Add preview image if available
+                '_artifi_preview_image': customizedProductData.previewImageUrl || '',
+                // Add any other relevant customization details
+                '_customized': 'true'
+              }
+            }]
+          };
+    
+          // Add to Shopify cart
+          addToShopifyCart(shopifyCartData);
+        }
+    
+        // Function to get the Shopify variant ID
+        function getShopifyVariantId() {
+          // TESTING: Prioritize URL parameter for easy testing
+          const urlParams = new URLSearchParams(window.location.search);
+          const variantId = urlParams.get('variant_id');
+          
+          if (variantId) {
+              console.log('Using variant ID from URL parameter:', variantId);
+              return variantId;
+          }
+
+          // Option 2: Get from a hidden form field or data attribute
+          const variantInput = document.querySelector('input[name="id"]');
+          if (variantInput) {
+              console.log('Found variant ID from input:', variantInput.value);
+              return variantInput.value;
+          }
+
+          // Option 3: Get from a data attribute on the page
+          const productElement = document.querySelector('[data-variant-id]');
+          if (productElement) {
+              const id = productElement.getAttribute('data-variant-id');
+              console.log('Found variant ID from data attribute:', id);
+              return id;
+          }
+
+          // Option 4: Try to extract from script tags (Shopify sometimes embeds product data)
+          const scripts = document.querySelectorAll('script');
+          for (let script of scripts) {
+              if (script.innerHTML.includes('variant') && script.innerHTML.includes('id')) {
+                  // This is a fallback - you may need to customize based on your theme
+                  console.log('Found potential variant data in script tag');
+              }
+          }
+
+          // Fallback - log error but don't fail completely
+          console.error('Could not determine Shopify variant ID - add ?variant_id=YOUR_ID to URL');
+          
+          // Return a test variant ID for development (replace with actual ID)
+          return '49884783345968'; // Use the ID from your dev store
+        }
+    
+        // Function to add item to Shopify cart using Ajax API
+        function addToShopifyCart(cartData) {
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(cartData)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Successfully added to Shopify cart:', data);
+            
+            // Show success message
+            alert('Customized product added to cart successfully!');
+            
+            // Optionally redirect to cart page or update cart drawer
+            // window.location.href = '/cart';
+            
+            // Or trigger cart drawer update if you have one
+            // updateCartDrawer();
+            
+            // Or update cart count in header
+            updateCartCount();
+          })
+          .catch(error => {
+            console.error('Error adding to Shopify cart:', error);
+            alert('Error adding item to cart. Please try again.');
+          });
+        }
+    
+        // Function to update cart count in header (optional)
+        function updateCartCount() {
+          fetch('/cart.js')
+            .then(response => response.json())
+            .then(cart => {
+              // Update cart count display
+              const cartCountElements = document.querySelectorAll('.cart-count, [data-cart-count]');
+              cartCountElements.forEach(element => {
+                element.textContent = cart.item_count;
+              });
+            })
+            .catch(error => {
+              console.error('Error updating cart count:', error);
+            });
+        }
+
+        // Function to get product handle from SKU or current page
+        function getProductHandle() {
+          console.log('getProductHandle: Starting to determine product handle');
+          
+          // Try to get from URL parameters first
+          const urlParams = new URLSearchParams(window.location.search);
+          const sku = urlParams.get('sku');
+          const productHandle = urlParams.get('product_handle') || urlParams.get('handle');
+          console.log('getProductHandle: SKU from URL:', sku);
+          console.log('getProductHandle: Product handle from URL:', productHandle);
+          
+          // Option 1: Use explicit product handle from URL if provided
+          if (productHandle) {
+              console.log('getProductHandle: Using explicit product handle from URL:', productHandle);
+              return productHandle;
+          }
+          
+          // Option 2: Get from current page URL if we're on a product page
+          const currentPath = window.location.pathname;
+          console.log('getProductHandle: Current path:', currentPath);
+          const pathParts = currentPath.split('/');
+          const productsIndex = pathParts.indexOf('products');
+          console.log('getProductHandle: Path parts:', pathParts, 'products index:', productsIndex);
+          if (productsIndex !== -1 && pathParts[productsIndex + 1]) {
+              const handle = pathParts[productsIndex + 1];
+              console.log('getProductHandle: Found handle from URL path:', handle);
+              return handle;
+          }
+          
+          // Option 3: Try to get from a data attribute or hidden field
+          const productElement = document.querySelector('[data-product-handle]');
+          if (productElement) {
+              const handle = productElement.getAttribute('data-product-handle');
+              console.log('getProductHandle: Found handle from data attribute:', handle);
+              return handle;
+          }
+          
+          // Option 4: Try to get from meta tags or other page elements
+          const metaProduct = document.querySelector('meta[property="product:retailer_item_id"], meta[name="product-id"]');
+          if (metaProduct) {
+              const content = metaProduct.getAttribute('content');
+              console.log('getProductHandle: Found product info in meta tag:', content);
+              // This might be a product ID or handle depending on your setup
+          }
+          
+          // Option 5: SKU-to-handle mapping (you may need to customize this)
+          if (sku) {
+              console.log('getProductHandle: Trying SKU-to-handle mapping for SKU:', sku);
+              
+              // Try different common handle formats based on SKU
+              const possibleHandles = [
+                  sku.toLowerCase(),                           // bmbg7005
+                  sku.toLowerCase().replace(/[^a-z0-9]/g, '-'), // bmbg7005 (already clean)
+                  sku.toLowerCase().replace(/(\w+)(\d+)/, '$1-$2'), // bmbg-7005
+              ];
+              
+              console.log('getProductHandle: Possible handles to try:', possibleHandles);
+              
+              // For now, return the first option, but we could test multiple
+              const derivedHandle = possibleHandles[0];
+              console.log('getProductHandle: Using derived handle:', derivedHandle);
+              return derivedHandle;
+          }
+          
+          console.warn('getProductHandle: Could not determine product handle');
+          console.warn('getProductHandle: Consider adding ?product_handle=your-handle to the URL');
+          return null;
+        }
+
+        // Function to fetch product data and imprint methods using GraphQL Storefront API
+        async function fetchProductData(productHandle) {
+          try {
+              console.log('fetchProductData: Starting GraphQL fetch for handle:', productHandle);
+              
+              const query = `
+                  query getProductAndImprintMethods($handle: String!) {
+                      product(handle: $handle) {
+                          id
+                          title
+                          handle
+                          variants(first: 10) {
+                              nodes {
+                                  id
+                                  title
+                                  price {
+                                      amount
+                                  }
+                                  sku
+                              }
+                          }
+                          metafields(identifiers: [
+                              {namespace: "custom", key: "price_breaks"},
+                              {namespace: "custom", key: "available_imprint_methods"}
+                          ]) {
+                              namespace
+                              key
+                              value
+                          }
+                      }
+                      metaobjects(type: "imprint_method", first: 20) {
+                          nodes {
+                              id
+                              handle
+                              methodName: field(key: "method_name") {
+                                  value
+                              }
+                              upchargeTiers: field(key: "upcharge_tiers") {
+                                  value
+                              }
+                              description: field(key: "description") {
+                                  value
+                              }
+                              isActive: field(key: "is_active") {
+                                  value
+                              }
+                          }
+                      }
+                  }
+              `;
+              
+              const requestBody = {
+                  query: query,
+                  variables: { handle: productHandle }
+              };
+              
+              console.log('fetchProductData: GraphQL query:', query);
+              console.log('fetchProductData: GraphQL variables:', { handle: productHandle });
+              
+              const response = await fetch('/api/2023-10/graphql.json', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-Shopify-Storefront-Access-Token': 'ff6e32cba592963d57044dd1c93a8877'
+                  },
+                  body: JSON.stringify(requestBody)
+              });
+              
+              console.log('fetchProductData: GraphQL response status:', response.status);
+              console.log('fetchProductData: GraphQL response OK:', response.ok);
+              
+              if (!response.ok) {
+                  console.error('fetchProductData: GraphQL response not OK. Status:', response.status);
+                  const responseText = await response.text();
+                  console.error('fetchProductData: GraphQL response body:', responseText);
+                  throw new Error(`GraphQL HTTP error! status: ${response.status} - ${response.statusText}`);
+              }
+              
+              const result = await response.json();
+              console.log('fetchProductData: GraphQL raw result:', result);
+              
+              if (result.errors) {
+                  console.error('fetchProductData: GraphQL errors:', result.errors);
+                  throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`);
+              }
+              
+              if (!result.data || !result.data.product) {
+                  console.error('fetchProductData: No product found for handle:', productHandle);
+                  throw new Error(`Product not found for handle: ${productHandle}`);
+              }
+              
+              const productData = result.data.product;
+              console.log('fetchProductData: Successfully fetched product:', productData.title);
+              console.log('fetchProductData: Product variants:', productData.variants.nodes.length);
+              console.log('fetchProductData: Product metafields:', productData.metafields);
+              
+              // Transform the GraphQL response to match expected format
+              const transformedData = {
+                  id: productData.id,
+                  title: productData.title,
+                  handle: productData.handle,
+                  variants: productData.variants.nodes,
+                  metafields: {
+                      custom: {}
+                  },
+                  imprintMethods: {}
+              };
+              
+              // Add metafields if they exist
+              if (productData.metafields && productData.metafields.length > 0) {
+                  const priceBreaksMetafield = productData.metafields.find(mf => mf.key === 'price_breaks');
+                  if (priceBreaksMetafield) {
+                      transformedData.metafields.custom.bulk_pricing = priceBreaksMetafield.value;
+                      console.log('fetchProductData: Found price_breaks metafield:', priceBreaksMetafield.value);
+                  }
+                  
+                  const availableMethodsMetafield = productData.metafields.find(mf => mf.key === 'available_imprint_methods');
+                  if (availableMethodsMetafield) {
+                      transformedData.metafields.custom.available_imprint_methods = availableMethodsMetafield.value;
+                      console.log('fetchProductData: Found available_imprint_methods metafield:', availableMethodsMetafield.value);
+                  }
+              }
+              
+              // Process imprint methods from metaobjects
+              if (result.data.metaobjects && result.data.metaobjects.nodes) {
+                  console.log('fetchProductData: Processing', result.data.metaobjects.nodes.length, 'imprint methods');
+                  
+                  for (const metaobject of result.data.metaobjects.nodes) {
+                      const methodName = metaobject.methodName?.value;
+                      const upchargeTiersRaw = metaobject.upchargeTiers?.value;
+                      const description = metaobject.description?.value || '';
+                      const isActive = metaobject.isActive?.value === 'true' || metaobject.isActive?.value === true;
+                      const methodKey = metaobject.handle ? metaobject.handle.replace(/-/g, '_').toLowerCase() : '';
+                      
+                      // DEBUG: Log raw metaobject data
+                      console.log('DEBUG metaobject for', metaobject.handle, ':', {
+                          handle: metaobject.handle,
+                          methodName: methodName,
+                          upchargeTiersRaw: upchargeTiersRaw,
+                          description: description,
+                          isActive: isActive,
+                          methodKey: methodKey,
+                          fullMetaobject: metaobject
+                      });
+                      
+                      let upchargeTiers = null;
+                      if (upchargeTiersRaw) {
+                          try {
+                              const parsedTiers = JSON.parse(upchargeTiersRaw);
+                              upchargeTiers = parsedTiers.tiers || [];
+                              console.log('fetchProductData: Parsed upcharge tiers for', methodKey, ':', upchargeTiers);
+                          } catch (error) {
+                              console.error('fetchProductData: Error parsing upcharge tiers for', methodKey, ':', error);
+                              console.error('fetchProductData: Raw data was:', upchargeTiersRaw);
+                          }
+                      } else {
+                          console.warn('fetchProductData: No upchargeTiersRaw for', methodKey, '- value was:', upchargeTiersRaw);
+                      }
+                      
+                      if (methodKey && methodName && isActive && upchargeTiers && upchargeTiers.length > 0) {
+                          transformedData.imprintMethods[methodKey] = {
+                              methodKey,
+                              methodName,
+                              upchargeTiers,
+                              description,
+                              isActive,
+                              handle: metaobject.handle
+                          };
+                          
+                          // Also map the original handle for flexibility
+                          if (metaobject.handle !== methodKey) {
+                              transformedData.imprintMethods[metaobject.handle.toLowerCase()] = transformedData.imprintMethods[methodKey];
+                          }
+                          
+                          console.log('fetchProductData: Successfully loaded tiered imprint method:', methodKey, 'with', upchargeTiers.length, 'tiers');
+                      } else {
+                          console.warn('fetchProductData: Skipped metaobject:', methodKey, 'due to missing data:', {
+                              hasMethodKey: !!methodKey,
+                              hasMethodName: !!methodName,
+                              isActive: isActive,
+                              hasUpchargeTiers: !!(upchargeTiers && upchargeTiers.length > 0),
+                              upchargeTiersLength: upchargeTiers ? upchargeTiers.length : 0
+                          });
+                      }
+                  }
+                  
+                  console.log('fetchProductData: Successfully loaded', Object.keys(transformedData.imprintMethods).length, 'imprint methods');
+              } else {
+                  console.warn('fetchProductData: No imprint methods found in metaobjects');
+              }
+              
+              console.log('fetchProductData: Transformed product data:', transformedData);
+              return transformedData;
+              
+          } catch (error) {
+              console.error('fetchProductData: Error occurred:', error);
+              console.error('fetchProductData: Error stack:', error.stack);
+              throw error;
+          }
+        }
+
+        // PRODUCTION: Server-side pricing calculation that matches the metafield structure
+        function calculateBulkPriceServerSide(quantity) {
+          // Production volume pricing tiers (matches custom.price_breaks metafield)
+          const volumePricingTiers = [
+            { minQty: 50, price: 1.75 },  // Matches metafield: 50+ items at $1.75
+            { minQty: 25, price: 2.00 },  // Matches metafield: 25+ items at $2.00  
+            { minQty: 10, price: 2.50 },  // Matches metafield: 10+ items at $2.50
+            { minQty: 1, price: 3.00 }    // Matches metafield: 1+ items at $3.00 (base)
+          ];
+          
+          // Find applicable tier (highest quantity threshold that applies)
+          for (const tier of volumePricingTiers) {
+            if (quantity >= tier.minQty) {
+              console.log('Frontend: Volume pricing applied:', quantity, 'items at', tier.price, 'each');
+              return {
+                unitPrice: tier.price,
+                totalPrice: tier.price * quantity,
+                appliedBreak: { min_qty: tier.minQty, price: tier.price },
+                quantity: quantity
+              };
+            }
+          }
+          
+          // Fallback to base price (should never reach here)
+          console.warn('Frontend: No volume pricing tier found for quantity:', quantity);
+          return {
+            unitPrice: 3.00,
+            totalPrice: 3.00 * quantity,
+            appliedBreak: { min_qty: 1, price: 3.00 },
+            quantity: quantity
+          };
+        }
+
+
+        // NEW: Server-side upcharge calculation with quantity-based tiers
+        function calculateServerSideUpcharge(imprintMethod, quantity) {
+          // Server-authoritative tiered upcharges (MUST match function logic)
+          const serverTieredUpcharges = {
+            'screen_print': [
+              { min_qty: 1, upcharge: 0.15 },
+              { min_qty: 50, upcharge: 0.12 },
+              { min_qty: 100, upcharge: 0.10 }
+            ],
+            'screen-print': [
+              { min_qty: 1, upcharge: 0.15 },
+              { min_qty: 50, upcharge: 0.12 },
+              { min_qty: 100, upcharge: 0.10 }
+            ],
+            'screenprint': [
+              { min_qty: 1, upcharge: 0.15 },
+              { min_qty: 50, upcharge: 0.12 },
+              { min_qty: 100, upcharge: 0.10 }
+            ],
+            'embroidery': [
+              { min_qty: 1, upcharge: 0.25 },
+              { min_qty: 25, upcharge: 0.22 },
+              { min_qty: 50, upcharge: 0.20 },
+              { min_qty: 100, upcharge: 0.18 }
+            ],
+            'embroidered': [
+              { min_qty: 1, upcharge: 0.25 },
+              { min_qty: 25, upcharge: 0.22 },
+              { min_qty: 50, upcharge: 0.20 },
+              { min_qty: 100, upcharge: 0.18 }
+            ],
+            'laser': [
+              { min_qty: 1, upcharge: 0.35 },
+              { min_qty: 25, upcharge: 0.30 },
+              { min_qty: 50, upcharge: 0.25 },
+              { min_qty: 100, upcharge: 0.20 }
+            ],
+            'laser_engraving': [
+              { min_qty: 1, upcharge: 0.35 },
+              { min_qty: 25, upcharge: 0.30 },
+              { min_qty: 50, upcharge: 0.25 },
+              { min_qty: 100, upcharge: 0.20 }
+            ],
+            'laser-engraving': [
+              { min_qty: 1, upcharge: 0.35 },
+              { min_qty: 25, upcharge: 0.30 },
+              { min_qty: 50, upcharge: 0.25 },
+              { min_qty: 100, upcharge: 0.20 }
+            ],
+            'engraving': [
+              { min_qty: 1, upcharge: 0.35 },
+              { min_qty: 25, upcharge: 0.30 },
+              { min_qty: 50, upcharge: 0.25 },
+              { min_qty: 100, upcharge: 0.20 }
+            ],
+            'engrave': [
+              { min_qty: 1, upcharge: 0.35 },
+              { min_qty: 25, upcharge: 0.30 },
+              { min_qty: 50, upcharge: 0.25 },
+              { min_qty: 100, upcharge: 0.20 }
+            ]
+          };
+          
+          const methodKey = imprintMethod.toLowerCase();
+          const methodTiers = serverTieredUpcharges[methodKey] || serverTieredUpcharges['screen_print'];
+          
+          // Find applicable tier (highest min_qty that quantity meets)
+          const applicableTier = methodTiers
+            .filter(tier => quantity >= tier.min_qty)
+            .sort((a, b) => b.min_qty - a.min_qty)[0];
+          
+          const upcharge = applicableTier ? applicableTier.upcharge : methodTiers[0].upcharge;
+          
+          console.log('Frontend: Server-calculated tiered upcharge for', methodKey, 'qty', quantity, ':', upcharge, 'from tier:', applicableTier);
+          return upcharge;
+        }
+
+        // Function to calculate bulk pricing (LEGACY - keep for compatibility)
+        function calculateBulkPrice(quantity, bulkPricingData) {
+          if (!bulkPricingData || !bulkPricingData.breaks) {
+              console.warn('No bulk pricing data available, using server-side calculation');
+              return calculateBulkPriceServerSide(quantity);
+          }
+          
+          // Find the applicable price break
+          const applicableBreak = bulkPricingData.breaks
+              .filter(breakItem => quantity >= breakItem.min_qty)
+              .sort((a, b) => b.min_qty - a.min_qty)[0];
+          
+          // Convert string prices to numbers with proper rounding
+          const unitPriceString = applicableBreak ? applicableBreak.price : bulkPricingData.breaks[0].price;
+          const rawUnitPrice = parseFloat(unitPriceString);
+          const unitPrice = Math.round(rawUnitPrice * 100) / 100;  // Ensure proper rounding
+          const totalPrice = Math.round(unitPrice * quantity * 100) / 100;
+          
+          console.log('Volume price calculation debug:', {
+            quantity,
+            applicableBreak,
+            unitPriceString,
+            rawUnitPrice,
+            roundedUnitPrice: unitPrice,
+            totalPrice
+          });
+          
+          return {
+              unitPrice: unitPrice,
+              totalPrice: totalPrice,
+              appliedBreak: applicableBreak,
+              quantity: quantity
+          };
+        }
+
+        // Function to prepare cart data with bulk pricing
+        function prepareCartData(artifiData, productData, quantity = 1) {
+          // Parse Artifi customization data
+          let customizedProductData;
+          try {
+              customizedProductData = typeof artifiData === 'string' ? JSON.parse(artifiData) : artifiData;
+          } catch (error) {
+              console.error('Error parsing Artifi data:', error);
+              customizedProductData = artifiData;
+          }
+          
+          // Get bulk pricing data
+          let bulkPricingData = null;
+          if (productData.metafields && productData.metafields.custom && productData.metafields.custom.bulk_pricing) {
+              try {
+                  bulkPricingData = typeof productData.metafields.custom.bulk_pricing === 'string' 
+                      ? JSON.parse(productData.metafields.custom.bulk_pricing)
+                      : productData.metafields.custom.bulk_pricing;
+              } catch (error) {
+                  console.error('Error parsing bulk pricing data:', error);
+              }
+          }
+          
+          // PRODUCTION: Use actual metafield price breaks when available
+          let pricingInfo;
+          let pricingSource;
+          
+          if (bulkPricingData && bulkPricingData.breaks && bulkPricingData.breaks.length > 0) {
+              pricingInfo = calculateBulkPrice(quantity, bulkPricingData);
+              pricingSource = 'metafield';
+              console.log('Using metafield price breaks:', bulkPricingData.breaks);
+              console.log('Calculated pricing from metafield:', pricingInfo);
+          } else {
+              pricingInfo = calculateBulkPriceServerSide(quantity);
+              pricingSource = 'server_fallback';
+              console.log('No metafield price breaks found, using server fallback');
+              console.log('Calculated pricing from server fallback:', pricingInfo);
+          }
+          
+          console.log('Volume pricing source:', pricingSource, '| Unit price:', pricingInfo.unitPrice);
+          
+          // Get variant ID (use existing function)
+          const variantId = getShopifyVariantId();
+          
+          // TESTING: Use imprint method from URL parameter or default to screen print
+          const urlParams = new URLSearchParams(window.location.search);
+          const selectedImprintMethod = urlParams.get('imprint_method') || 'screen_print';
+          
+          console.log('Selected imprint method from URL:', selectedImprintMethod);
+          
+          
+          // NEW APPROACH: Prioritize metaobjects with quantity-based tiers, fallback to server calculation
+          let selectedImprintUpcharge = calculateServerSideUpcharge(selectedImprintMethod, quantity); // Fallback
+          let upchargeSource = 'server_fallback';
+          
+          console.log('Server-calculated fallback tiered upcharge for', selectedImprintMethod, 'qty', quantity, ':', selectedImprintUpcharge);
+          
+          // Try to get upcharge from metaobjects FIRST (prioritize dynamic pricing)
+          if (productData.imprintMethods && productData.imprintMethods[selectedImprintMethod]) {
+              const methodData = productData.imprintMethods[selectedImprintMethod];
+              if (methodData.upchargeTiers && methodData.upchargeTiers.length > 0) {
+                  // Calculate quantity-based upcharge from metaobject
+                  const applicableUpchargeTier = methodData.upchargeTiers
+                      .filter(tier => quantity >= tier.min_qty)
+                      .sort((a, b) => b.min_qty - a.min_qty)[0];
+                  
+                  if (applicableUpchargeTier) {
+                      selectedImprintUpcharge = parseFloat(applicableUpchargeTier.upcharge);
+                      upchargeSource = 'metaobject';
+                      console.log('Using metaobject tiered upcharge for', selectedImprintMethod, 'qty', quantity, ':', selectedImprintUpcharge, 'from tier:', applicableUpchargeTier);
+                  } else {
+                      // Use first tier if no quantity match
+                      selectedImprintUpcharge = parseFloat(methodData.upchargeTiers[0].upcharge);
+                      upchargeSource = 'metaobject_fallback';
+                      console.log('Using metaobject first tier upcharge for', selectedImprintMethod, ':', selectedImprintUpcharge);
+                  }
+              }
+          } else {
+              // Try alternative key formats for the selected method
+              const alternativeKeys = [
+                  selectedImprintMethod.replace('-', '_'),
+                  selectedImprintMethod.replace('_', '-'),
+                  selectedImprintMethod.replace(/[^a-z0-9]/g, '')
+              ];
+              
+              for (const altKey of alternativeKeys) {
+                  if (productData.imprintMethods && productData.imprintMethods[altKey]) {
+                      const methodData = productData.imprintMethods[altKey];
+                      if (methodData.upchargeTiers && methodData.upchargeTiers.length > 0) {
+                          const applicableUpchargeTier = methodData.upchargeTiers
+                              .filter(tier => quantity >= tier.min_qty)
+                              .sort((a, b) => b.min_qty - a.min_qty)[0];
+                          
+                          if (applicableUpchargeTier) {
+                              selectedImprintUpcharge = parseFloat(applicableUpchargeTier.upcharge);
+                              upchargeSource = 'metaobject_alt_key';
+                              console.log('Using metaobject tiered upcharge for', altKey, '(alternative key) qty', quantity, ':', selectedImprintUpcharge);
+                              break;
+                          }
+                      }
+                  }
+              }
+              
+              if (upchargeSource === 'server_fallback') {
+                  console.log('Using server-calculated tiered fallback upcharge for', selectedImprintMethod, 'qty', quantity, ':', selectedImprintUpcharge);
+                  console.warn('Method not found in metaobjects:', selectedImprintMethod);
+                  console.log('Available methods:', Object.keys(productData.imprintMethods || {}));
+              }
+          }
+          
+          console.log('Final upcharge source:', upchargeSource, '| Amount:', selectedImprintUpcharge);
+          
+          // Prepare Shopify cart data structure with ALL required properties for Shopify Function
+          const cartData = {
+              items: [{
+                  id: variantId,
+                  quantity: quantity,
+                  properties: {
+                      // Artifi customization data
+                      '_artifi_design_id': customizedProductData.designId || '',
+                      '_artifi_sku': customizedProductData.sku || '',
+                      '_artifi_customization_data': JSON.stringify(customizedProductData),
+                      '_artifi_preview_image': customizedProductData.previewImageUrl || '',
+                      '_customized': 'true',
+                      
+                      // CRITICAL: Bulk pricing trigger property
+                      'bulk_pricing_applied': 'true',
+                      
+                      // Bulk pricing properties (for Shopify Function)
+                      'price': pricingInfo ? pricingInfo.unitPrice.toFixed(2) : '3.00',
+                      'total_price': pricingInfo ? pricingInfo.totalPrice.toFixed(2) : (3.00 * quantity).toFixed(2),
+                      'quantity': quantity.toString(),
+                      'original': bulkPricingData && bulkPricingData.breaks ? bulkPricingData.breaks[0].price : '3.00',
+                      'savings_amount': pricingInfo ? ((parseFloat(bulkPricingData.breaks[0].price) - pricingInfo.unitPrice) * quantity).toFixed(2) : '0.00',
+                      
+                      // Imprint method properties (for Shopify Function)
+                      'method': selectedImprintMethod,
+                      'upcharge': selectedImprintUpcharge.toFixed(2),
+                      'upcharge_source': upchargeSource,  // Tell function where upcharge came from
+                      'pricing_source': pricingSource,    // Tell function where volume pricing came from
+                      
+                      
+                      // Final pricing properties 
+                      'final_price': pricingInfo ? (pricingInfo.unitPrice + selectedImprintUpcharge).toFixed(2) : (3.00 + selectedImprintUpcharge).toFixed(2),
+                      'final_total': pricingInfo ? ((pricingInfo.unitPrice + selectedImprintUpcharge) * quantity).toFixed(2) : ((3.00 + selectedImprintUpcharge) * quantity).toFixed(2),
+                      
+                      // Metadata for debugging
+                      '_pricing_version': '2.0',
+                      '_function_target': 'purchase.cart-transform'
+                  }
+              }]
+          };
+          
+          return {
+              cartData: cartData,
+              pricingInfo: pricingInfo,
+              bulkPricingData: bulkPricingData,
+              productData: productData,
+              artifiData: customizedProductData
+          };
+        }
+
+        // Main function to handle bulk pricing workflow
+        async function handleBulkPricingWorkflow(artifiData) {
+          try {
+              console.log('Starting bulk pricing workflow...');
+              console.log('Artifi data received:', artifiData);
+              
+              // Show loading indicator
+              showPricingLoadingState();
+              
+              // Get product handle
+              console.log('Getting product handle...');
+              const productHandle = getProductHandle();
+              console.log('Product handle:', productHandle);
+              if (!productHandle) {
+                  throw new Error('Could not determine product handle');
+              }
+              
+              // Fetch product data
+              console.log('Fetching product data...');
+              const productData = await fetchProductData(productHandle);
+              console.log('Product data fetched successfully');
+              
+              // Store data globally for modal functions
+              window.currentBulkPricingData = {
+                  artifiData: artifiData,
+                  productData: productData,
+                  productHandle: productHandle
+              };
+              
+              // Show the bulk pricing modal
+              showBulkPricingModal(productData);
+              
+          } catch (error) {
+              console.error('Error in bulk pricing workflow:', error);
+              console.error('Error stack:', error.stack);
+              
+              // Show user-friendly error handling
+              showPricingError(error.message || 'Unable to calculate bulk pricing');
+              
+              // Log detailed error for debugging
+              console.error('Bulk pricing workflow failed:', {
+                error: error.message,
+                stack: error.stack,
+                artifiData: artifiData,
+                timestamp: new Date().toISOString()
+              });
+          } finally {
+              // Always clean up loading states
+              hidePricingLoadingState();
+              
+              const AddToCart = document.getElementById('AddToCart');
+              if (AddToCart) {
+                AddToCart.classList.remove('loading');
+              }
+          }
+        }
+
+        // Function to show bulk pricing modal
+        function showBulkPricingModal(productData) {
+          console.log('showBulkPricingModal: Showing modal with product data');
+          
+          const modal = document.getElementById('bulkPricingModal');
+          const quantityInput = document.getElementById('quantityInput');
+          
+          // Reset to quantity 1
+          quantityInput.value = 1;
+          
+          // Setup pricing tiers display
+          setupPricingTiers(productData);
+          
+          // Update initial pricing
+          updateModalPricing(1);
+          
+          // Show modal
+          modal.style.display = 'block';
+          
+          // Setup event listeners if not already done
+          if (!window.bulkPricingModalSetup) {
+              setupBulkPricingModalEvents();
+              window.bulkPricingModalSetup = true;
+          }
+        }
+
+        // Function to setup pricing tiers display
+        function setupPricingTiers(productData) {
+          const pricingTiersContainer = document.getElementById('pricingTiers');
+          
+          // Get bulk pricing data
+          let bulkPricingData = null;
+          if (productData.metafields && productData.metafields.custom && productData.metafields.custom.bulk_pricing) {
+              try {
+                  bulkPricingData = typeof productData.metafields.custom.bulk_pricing === 'string' 
+                      ? JSON.parse(productData.metafields.custom.bulk_pricing)
+                      : productData.metafields.custom.bulk_pricing;
+              } catch (error) {
+                  console.error('Error parsing bulk pricing data:', error);
+              }
+          }
+          
+          if (!bulkPricingData || !bulkPricingData.breaks) {
+              pricingTiersContainer.innerHTML = '<p>No bulk pricing available</p>';
+              return;
+          }
+          
+          // Display pricing tiers
+          let tiersHTML = '';
+          bulkPricingData.breaks.forEach(tier => {
+              tiersHTML += `
+                  <div class="pricing-tier" data-min-qty="${tier.min_qty}">
+                      <span>${tier.min_qty}+ items</span>
+                      <span>$${parseFloat(tier.price).toFixed(2)} each</span>
+                  </div>
+              `;
+          });
+          
+          pricingTiersContainer.innerHTML = tiersHTML;
+        }
+
+        // Function to update modal pricing based on quantity
+        function updateModalPricing(quantity) {
+          if (!window.currentBulkPricingData) return;
+          
+          const { productData } = window.currentBulkPricingData;
+          
+          // Get bulk pricing data
+          let bulkPricingData = null;
+          if (productData.metafields && productData.metafields.custom && productData.metafields.custom.bulk_pricing) {
+              try {
+                  bulkPricingData = typeof productData.metafields.custom.bulk_pricing === 'string' 
+                      ? JSON.parse(productData.metafields.custom.bulk_pricing)
+                      : productData.metafields.custom.bulk_pricing;
+              } catch (error) {
+                  console.error('Error parsing bulk pricing data:', error);
+              }
+          }
+          
+          // Calculate pricing
+          const pricingInfo = calculateBulkPrice(quantity, bulkPricingData);
+          
+          // Update displays
+          const unitPriceElement = document.getElementById('currentUnitPrice');
+          const totalPriceElement = document.getElementById('currentTotalPrice');
+          const modalQuantityElement = document.getElementById('modalQuantity');
+          
+          if (pricingInfo) {
+              unitPriceElement.textContent = pricingInfo.unitPrice.toFixed(2);
+              totalPriceElement.textContent = pricingInfo.totalPrice.toFixed(2);
+          } else {
+              unitPriceElement.textContent = '0.00';
+              totalPriceElement.textContent = '0.00';
+          }
+          
+          modalQuantityElement.textContent = quantity;
+          
+          // Highlight active pricing tier
+          const pricingTiers = document.querySelectorAll('.pricing-tier');
+          pricingTiers.forEach(tier => {
+              const minQty = parseInt(tier.getAttribute('data-min-qty'));
+              if (quantity >= minQty) {
+                  tier.classList.add('active');
+              } else {
+                  tier.classList.remove('active');
+              }
+          });
+          
+          // Keep only the highest applicable tier highlighted
+          const activeTiers = document.querySelectorAll('.pricing-tier.active');
+          if (activeTiers.length > 1) {
+              activeTiers.forEach((tier, index) => {
+                  if (index < activeTiers.length - 1) {
+                      tier.classList.remove('active');
+                  }
+              });
+          }
+        }
+
+        // Function to setup modal event listeners
+        function setupBulkPricingModalEvents() {
+          const modal = document.getElementById('bulkPricingModal');
+          const closeBtn = document.querySelector('.bulk-pricing-close');
+          const quantityInput = document.getElementById('quantityInput');
+          const decreaseBtn = document.getElementById('decreaseQty');
+          const increaseBtn = document.getElementById('increaseQty');
+          const confirmBtn = document.getElementById('confirmAddToCart');
+          
+          // Close modal events
+          closeBtn.onclick = function() {
+              modal.style.display = 'none';
+          };
+          
+          window.onclick = function(event) {
+              if (event.target === modal) {
+                  modal.style.display = 'none';
+              }
+          };
+          
+          // Quantity change events
+          quantityInput.addEventListener('input', function() {
+              const quantity = Math.max(1, parseInt(this.value) || 1);
+              this.value = quantity;
+              updateModalPricing(quantity);
+          });
+          
+          decreaseBtn.addEventListener('click', function() {
+              const currentQty = parseInt(quantityInput.value) || 1;
+              const newQty = Math.max(1, currentQty - 1);
+              quantityInput.value = newQty;
+              updateModalPricing(newQty);
+          });
+          
+          increaseBtn.addEventListener('click', function() {
+              const currentQty = parseInt(quantityInput.value) || 1;
+              const newQty = currentQty + 1;
+              quantityInput.value = newQty;
+              updateModalPricing(newQty);
+          });
+          
+          // Confirm add to cart
+          confirmBtn.addEventListener('click', function() {
+              const quantity = parseInt(quantityInput.value) || 1;
+              addToCartWithBulkPricing(quantity);
+          });
+        }
+
+        // Function to add item to cart with bulk pricing
+        async function addToCartWithBulkPricing(quantity) {
+          if (!window.currentBulkPricingData) {
+              alert('Error: No product data available');
+              return;
+          }
+          
+          try {
+              console.log('addToCartWithBulkPricing: Adding', quantity, 'items to cart');
+              
+              const { artifiData, productData } = window.currentBulkPricingData;
+              
+              // Prepare cart data with the selected quantity
+              const preparedData = prepareCartData(artifiData, productData, quantity);
+              console.log('addToCartWithBulkPricing: Prepared cart data:', preparedData);
+              
+              // Show loading state on modal button
+              const confirmBtn = document.getElementById('confirmAddToCart');
+              const originalText = confirmBtn.textContent;
+              confirmBtn.disabled = true;
+              confirmBtn.textContent = 'Adding to cart...';
+              
+              // Add to Shopify cart
+              await addToShopifyCartWithBulkPricing(preparedData.cartData);
+              
+              // Close modal on success
+              const modal = document.getElementById('bulkPricingModal');
+              modal.style.display = 'none';
+              
+              // Show success message
+              alert(`Successfully added ${quantity} customized item(s) to cart!`);
+              
+              // Update cart count
+              updateCartCount();
+              
+          } catch (error) {
+              console.error('addToCartWithBulkPricing: Error:', error);
+              alert('Error adding items to cart: ' + error.message);
+          } finally {
+              // Reset button state
+              const confirmBtn = document.getElementById('confirmAddToCart');
+              if (confirmBtn) {
+                  confirmBtn.disabled = false;
+                  confirmBtn.innerHTML = `Add to Cart - <span id="modalQuantity">${quantity}</span> item(s)`;
+              }
+          }
+        }
+
+        // Function to add item to Shopify cart with bulk pricing
+        async function addToShopifyCartWithBulkPricing(cartData) {
+          console.log('addToShopifyCartWithBulkPricing: Cart data:', cartData);
+          
+          const response = await fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(cartData)
+          });
+          
+          if (!response.ok) {
+              const errorText = await response.text();
+              console.error('addToShopifyCartWithBulkPricing: Cart API error:', errorText);
+              throw new Error(`Cart API error: ${response.status} - ${errorText}`);
+          }
+          
+          const result = await response.json();
+          console.log('addToShopifyCartWithBulkPricing: Successfully added to cart:', result);
+          
+          return result;
+        }
+    
+        // Main add to cart function
+        function addToCartDesignHnd() {
+          console.log('addToCartDesignHnd: Button clicked');
+          
+          // Check if variant ID is available
+          const variantId = getShopifyVariantId();
+          if (!variantId) {
+            alert('Please select a product variant before adding to cart.');
+            return;
+          }
+
+          // Check if we should use bulk pricing or simple cart
+          const urlParams = new URLSearchParams(window.location.search);
+          const useBulkPricing = urlParams.get('bulk_pricing') !== 'false';
+
+          if (useBulkPricing) {
+            // Use bulk pricing workflow (default)
+            // Show loading state on button
+            const AddToCart = document.getElementById('AddToCart');
+            AddToCart.classList.add('loading');
+            AddToCart.disabled = true;
+            
+            console.log('addToCartDesignHnd: Starting bulk pricing workflow');
+            
+            // Instead of calling Artifi.addToCart(), we'll get the design data manually
+            // and trigger our bulk pricing workflow
+            try {
+              // Try to get current design data from Artifi
+              if (window.Artifi && window.Artifi.getDesignData) {
+                const designData = window.Artifi.getDesignData();
+                console.log('addToCartDesignHnd: Got design data:', designData);
+                handleBulkPricingWorkflow(designData);
+              } else {
+                // Fallback: create a basic data structure
+                console.log('addToCartDesignHnd: Using fallback data structure');
+                const fallbackData = {
+                  sku: new URLSearchParams(window.location.search).get('sku') || 'UNKNOWN',
+                  designId: 'manual-' + Date.now(),
+                  previewImageUrl: ''
+                };
+                handleBulkPricingWorkflow(fallbackData);
+              }
+            } catch (error) {
+              console.error('addToCartDesignHnd: Error getting design data:', error);
+              // Remove loading state on error
+              AddToCart.classList.remove('loading');
+              AddToCart.disabled = false;
+              alert('Error getting design data: ' + error.message);
+            }
+          } else {
+            // Use simple add to cart (matching the updated HTML)
+            console.log('addToCartDesignHnd: Using simple add to cart');
+            window.Artifi.addToCart();
+          }
+        }
+    
+        // Enhanced UX functions for Phase 3
+        function showPricingLoadingState() {
+          const AddToCart = document.getElementById('AddToCart');
+          if (AddToCart) {
+            AddToCart.innerHTML = 'Calculating Pricing...';
+            AddToCart.disabled = true;
+          }
+        }
+        
+        function hidePricingLoadingState() {
+          const AddToCart = document.getElementById('AddToCart');
+          if (AddToCart) {
+            AddToCart.innerHTML = 'Add to Cart';
+            AddToCart.disabled = false;
+          }
+        }
+        
+        function showPricingError(message) {
+          const AddToCart = document.getElementById('AddToCart');
+          if (AddToCart) {
+            AddToCart.innerHTML = 'Pricing Error';
+            AddToCart.disabled = true;
+            setTimeout(() => {
+              AddToCart.innerHTML = 'Add to Cart';
+              AddToCart.disabled = false;
+            }, 3000);
+          }
+          
+          // Show user-friendly error message
+          if (typeof message === 'string') {
+            alert('Pricing calculation failed: ' + message + '\nPlease try again or contact support.');
+          }
+        }
+        
+        function showPricingSuccess(pricing) {
+          const AddToCart = document.getElementById('AddToCart');
+          if (AddToCart && pricing) {
+            const finalPrice = pricing.unitPrice + (pricing.imprintUpcharge || 0);
+            AddToCart.innerHTML = `Add to Cart - $${finalPrice.toFixed(2)}`;
+            AddToCart.disabled = false;
+          }
+        }
+
+        // Make functions available globally
+        window.addToCartDesignHnd = addToCartDesignHnd;
+        window.showPricingLoadingState = showPricingLoadingState;
+        window.hidePricingLoadingState = hidePricingLoadingState;
+        window.showPricingError = showPricingError;
+        window.showPricingSuccess = showPricingSuccess;
+
+    
+        function openIframe(evt, linkName) {
+          var i, tabview, tablinks;
+          window.Artifi.removeWidgetSelection();
+          tabview = document.getElementsByClassName("tabview");
+          for (i = 0; i < tabview.length; i++) {
+            tabview[i].style.display = "none";
+          }
+          tablinks = document.getElementsByClassName("tablinks");
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+          }
+    
+          document.getElementById(linkName).style.display = "block";
+          evt.currentTarget.className += " active";
+          let editTextHeading = document.getElementById("edit-text-heading");
+          if (editTextHeading) {
+            editTextHeading.style.display = "block";
+          }
+        }
+    
+        function openIframeOnWidgetSelect(linkName) {
+          var i, tabview, tablinks;
+          tabview = document.getElementsByClassName("tabview");
+          for (i = 0; i < tabview.length; i++) {
+            tabview[i].style.display = "none";
+          }
+          tablinks = document.getElementsByClassName("tablinks");
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+          }
+          document.getElementById(linkName).style.display = "block";
+          let editTextHeading = document.getElementById("edit-text-heading");
+          if (editTextHeading) {
+            editTextHeading.style.display = "none";
+          }
+        }
+    
+        document
+          .getElementById("uploadTab")
+          .addEventListener("click", function (e) {
+            const uploadContainer = document.getElementById(
+              "artifi-upload-container"
+            );
+            uploadContainer.style.display = "block";
+    
+            const imprintColorContainer = document.getElementById(
+              "artifi-imprint-color-container"
+            );
+            imprintColorContainer.style.display = "none";
+          });
+    
+        document.querySelectorAll(".tablinks").forEach((button) => {
+          button.addEventListener("click", () => {
+            const event = new CustomEvent("tabClicked");
+            window.dispatchEvent(event);
+          });
+        });
+      </script>
+    </body>
+    </html>

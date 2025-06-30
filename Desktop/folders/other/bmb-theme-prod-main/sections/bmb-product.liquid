@@ -1,0 +1,675 @@
+{%- comment -%}BMB Product Page Template{%- endcomment -%}
+{{ 'bmb-product-page.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+-%}
+
+<div class="bmb-product-container">
+  {%- comment -%}Product Image Section{%- endcomment -%}
+  <div class="bmb-product-media">
+    {%- if section.settings.show_best_seller_badge -%}
+      <span class="bmb-best-seller">Best Seller</span>
+    {%- endif -%}
+    
+    {%- if product.featured_image -%}
+      <div class="bmb-main-image">
+        {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', alt: product.title }}
+      </div>
+      
+      {%- if product.images.size > 1 -%}
+        <div class="bmb-image-thumbnails">
+          {%- for image in product.images limit: 3 -%}
+            <button class="bmb-thumb-btn{% if forloop.first %} active{% endif %}" data-image-url="{{ image | image_url: width: 600 }}">
+              {{ image | image_url: width: 100 | image_tag: loading: 'lazy', alt: product.title }}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'bmb-placeholder-image' }}
+    {%- endif -%}
+  </div>
+
+  {%- comment -%}Product Info Section{%- endcomment -%}
+  <div class="bmb-product-info">
+    {%- comment -%}Product Header{%- endcomment -%}
+    <div class="bmb-product-header">
+      <h1 class="bmb-product-title">{{ product.title }}</h1>
+      
+      <div class="bmb-product-meta">
+        <span class="bmb-product-sku">SKU: {{ current_variant.sku | default: product.id }}</span>
+        {%- if product.metafields.custom.manufacturer_number -%}
+          <span>| Mfgr#: {{ product.metafields.custom.manufacturer_number }}</span>
+        {%- endif -%}
+        
+        {%- if product.metafields.reviews.rating.value != blank -%}
+          <div class="bmb-product-rating">
+            <span class="bmb-rating-stars">
+              {%- assign rating = product.metafields.reviews.rating.value | round -%}
+              {%- for i in (1..5) -%}
+                {%- if i <= rating -%}★{%- else -%}☆{%- endif -%}
+              {%- endfor -%}
+            </span>
+            <span>({{ product.metafields.reviews.rating_count }} Reviews)</span>
+          </div>
+        {%- endif -%}
+      </div>
+
+      
+      
+      <div class="bmb-shipping-section">
+        <div class="bmb-shipping-left">
+          {%- if product.metafields.custom.price_breaks -%}
+            {%- assign price_data = product.metafields.custom.price_breaks.value -%}
+            {%- assign lowest_price = price_data.breaks | last -%}
+            <div class="bmb-lowest-price">
+              As Low As ${{ lowest_price.price }} Each
+            </div>
+          {%- endif -%}
+          <div class="bmb-shipping-info">
+            Typically ships 10-15 business days*
+          </div>
+          <div class="variant-availability" style="display: none; margin-top: 0.5rem;"></div>
+        </div>
+        
+        {%- if section.settings.show_need_sooner -%}
+          <div class="bmb-shipping-right">
+            <button class="bmb-need-sooner" type="button">Need It Sooner?</button>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <product-form>
+      {%- form 'product', product, id: product_form_id, class: 'bmb-product-form' -%}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+        {%- comment -%}Color Selection{%- endcomment -%}
+        {%- if product.variants.size > 1 -%}
+        <div class="bmb-color-section">
+          <h3 class="bmb-section-label">Choose Your Product Color</h3>
+          <div class="bmb-color-swatches">
+            {%- for variant in product.variants -%}
+              {%- assign color_name = variant.option1 | handle -%}
+              {%- comment -%}Fallback color mapping{%- endcomment -%}
+              {%- assign fallback_color = '#ccc' -%}
+              {%- case color_name -%}
+                {%- when 'white' -%}
+                  {%- assign fallback_color = '#ffffff' -%}
+                {%- when 'black' -%}
+                  {%- assign fallback_color = '#000000' -%}
+                {%- when 'red' -%}
+                  {%- assign fallback_color = '#dc3545' -%}
+                {%- when 'yellow-gold' -%}
+                  {%- assign fallback_color = '#ffd700' -%}
+                {%- when 'royal-blue' -%}
+                  {%- assign fallback_color = '#4169e1' -%}
+                {%- when 'natural-1' -%}
+                  {%- assign fallback_color = '#f5f5dc' -%}
+                {%- when 'purple' -%}
+                  {%- assign fallback_color = '#6f42c1' -%}
+              {%- endcase -%}
+              
+              <div class="bmb-color-option">
+                <button type="button" 
+                        class="bmb-color-swatch{% if variant.id == current_variant.id %} selected{% endif %}"
+                        data-variant-id="{{ variant.id }}"
+                        data-color="{{ variant.option1 }}"
+                        style="background-color: var(--color-{{ color_name }}, {{ fallback_color }});"
+                        aria-label="{{ variant.option1 }}">
+                </button>
+                <div class="bmb-color-label">{{ variant.option1 }}</div>
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        {%- comment -%}Imprint Method Tabs{%- endcomment -%}
+        <div class="bmb-imprint-section">
+          <h3 class="bmb-section-label">Choose Your Imprint Method</h3>
+          
+          {%- comment -%}Tab Navigation{%- endcomment -%}
+          <div class="bmb-imprint-tabs-nav">
+            {%- comment -%}Add Blank option first{%- endcomment -%}
+            <button type="button" 
+                    class="bmb-imprint-tab active"
+                    data-method="blank"
+                    title="Unimprinted item - no decoration or engraving">
+              Blank (No Imprint)
+            </button>
+
+            {%- if product.metafields.custom.available_imprint_methods.value -%}
+              {%- for method in product.metafields.custom.available_imprint_methods.value -%}
+                <button type="button" 
+                        class="bmb-imprint-tab"
+                        data-method="{{ method.method_name | handle }}"
+                        title="{{ method.description }}">
+                  {{ method.method_name }}
+                </button>
+              {%- endfor -%}
+            {%- elsif product.metafields.custom.available_imprint_methods -%}
+              {%- for method in product.metafields.custom.available_imprint_methods -%}
+                <button type="button" 
+                        class="bmb-imprint-tab"
+                        data-method="{{ method.method_name }}"
+                        title="{{ method.description }}">
+                  {{ method.method_name }}
+                </button>
+              {%- endfor -%}
+            {%- else -%}
+              <button type="button" class="bmb-imprint-tab" data-method="standard-imprint">
+                Standard Imprint
+              </button>
+              <button type="button" class="bmb-imprint-tab" data-method="premium-imprint">
+                Premium Imprint
+              </button>
+              <button type="button" class="bmb-imprint-tab" data-method="digital-imprint">
+                Digital Imprint
+              </button>
+              <button type="button" class="bmb-imprint-tab" data-method="engraved-imprint">
+                Engraved Imprint
+              </button>
+            {%- endif -%}
+          </div>
+
+          {%- comment -%}Pricing Grid Content{%- endcomment -%}
+          <div class="bmb-pricing-grid">
+            <p class="bmb-pricing-info" id="pricing-description">
+              Select an imprint method above to see pricing with decoration, or choose "Blank" for unimprinted pricing.
+            </p>
+            
+            <table class="bmb-pricing-table">
+              <thead>
+                <tr>
+                  <th class="price-label">Quantity</th>
+                  {%- if product.metafields.custom.price_breaks -%}
+                    {%- assign price_data = product.metafields.custom.price_breaks.value -%}
+                    {%- for break in price_data.breaks -%}
+                      <th>{{ break.min_qty }}+</th>
+                    {%- endfor -%}
+                  {%- else -%}
+                    <th>36+</th>
+                    <th>72+</th>
+                    <th>144+</th>
+                    <th>288+</th>
+                    <th>576+</th>
+                    <th>1008+</th>
+                    <th>2016+</th>
+                    <th>5000+</th>
+                  {%- endif -%}
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="pricing-row">
+                  <td class="price-label">Price per Piece</td>
+                  {%- if product.metafields.custom.price_breaks -%}
+                    {%- assign price_data = product.metafields.custom.price_breaks.value -%}
+                    {%- for break in price_data.breaks -%}
+                      <td class="price-cell" data-base-price="{{ break.price }}" data-quantity="{{ break.min_qty }}">${{ break.price }}</td>
+                    {%- endfor -%}
+                  {%- else -%}
+                    <td class="price-cell" data-base-price="3.00" data-quantity="36">$3.00</td>
+                    <td class="price-cell" data-base-price="2.90" data-quantity="72">$2.90</td>
+                    <td class="price-cell" data-base-price="2.80" data-quantity="144">$2.80</td>
+                    <td class="price-cell" data-base-price="2.70" data-quantity="288">$2.70</td>
+                    <td class="price-cell" data-base-price="2.60" data-quantity="576">$2.60</td>
+                    <td class="price-cell" data-base-price="2.50" data-quantity="1008">$2.50</td>
+                    <td class="price-cell" data-base-price="2.40" data-quantity="2016">$2.40</td>
+                    <td class="price-cell" data-base-price="2.30" data-quantity="5000">$2.30</td>
+                  {%- endif -%}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {%- comment -%}Action Buttons{%- endcomment -%}
+        <div class="bmb-action-buttons">
+          <a href="/pages/personalize?sku=BMBG7005&variant_id=45788690776322&imprint_method=embroidery&product_handle=16-oz-mixing-glass" 
+             class="bmb-btn-primary" 
+             id="start-designing-button">
+            Start Designing Now
+          </a>
+          <button type="button" class="bmb-btn-secondary">
+            Need Custom Art Services?
+          </button>
+        </div>
+      {%- endform -%}
+    </product-form>
+
+    {%- comment -%}Contact Info{%- endcomment -%}
+    <div class="bmb-contact-info">
+      <p><strong>Every order is reviewed for quality.</strong></p>
+      <p>Need help with your design? Email: <a href="mailto:sales@brandmybeverage.com">sales@brandmybeverage.com</a> or call us <a href="tel:888-230-7772">888-230-7772</a></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productData = {
+      handle: "{{ product.handle }}",
+      variants: {
+        {%- for variant in product.variants -%}
+          "{{ variant.id }}": {
+            id: {{ variant.id }},
+            sku: "{{ variant.sku }}",
+            color: "{{ variant.option1 }}",
+            price: {{ variant.price | money_without_currency }},
+            featured_image: {%- if variant.featured_image -%}"{{ variant.featured_image | image_url: width: 600 }}"{%- else -%}null{%- endif -%},
+            available: {{ variant.available | json }}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      },
+      bulkPricing: {{ product.metafields.custom.price_breaks.value | default: blank | json }},
+      imprintMethods: {
+        {%- if product.metafields.custom.available_imprint_methods.value -%}
+          {%- for method in product.metafields.custom.available_imprint_methods.value -%}
+            "{{ method.method_name | handle }}": {
+              name: "{{ method.method_name }}",
+              description: "{{ method.description }}",
+              upchargeTiers: {{ method.upcharge_tiers | default: blank | parse_json }}
+            }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        {%- endif -%}
+      }
+    };
+
+    let selectedVariantId = {{ current_variant.id }};
+    let selectedImprintMethod = 'blank'; // Default to blank pricing
+    
+    // Check if product has multiple variants
+    const hasColorVariants = Object.keys(productData.variants).length > 1;
+
+    // Thumbnail image selection
+    document.querySelectorAll('.bmb-thumb-btn').forEach(thumb => {
+      thumb.addEventListener('click', function() {
+        const imageUrl = this.dataset.imageUrl;
+        const mainImage = document.querySelector('.bmb-main-image img');
+        
+        if (mainImage && imageUrl) {
+          // Update active state
+          document.querySelectorAll('.bmb-thumb-btn').forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Update the main src attribute
+          mainImage.src = imageUrl;
+          
+          // Update srcset attribute for responsive images
+          const baseUrl = imageUrl.split('?')[0]; // Remove existing params
+          mainImage.srcset = `${baseUrl}?v=${Date.now()}&width=352 352w, ${baseUrl}?v=${Date.now()}&width=600 600w`;
+        }
+      });
+    });
+
+    // Color swatch selection (only if multiple variants exist)
+    if (hasColorVariants) {
+      document.querySelectorAll('.bmb-color-swatch').forEach(swatch => {
+        swatch.addEventListener('click', function() {
+          document.querySelectorAll('.bmb-color-swatch').forEach(s => s.classList.remove('selected'));
+          this.classList.add('selected');
+          
+          selectedVariantId = this.dataset.variantId;
+          updateVariant();
+        });
+      });
+    }
+
+    // Imprint method tab selection
+    document.querySelectorAll('.bmb-imprint-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.bmb-imprint-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        selectedImprintMethod = this.dataset.method;
+        updatePersonalizeButton();
+        updatePricingTable();
+        updatePricingDescription();
+      });
+    });
+
+    // Tab navigation
+    document.querySelectorAll('.bmb-tab-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const targetTab = this.dataset.tab;
+        
+        // Update active states
+        document.querySelectorAll('.bmb-tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.bmb-tab-content').forEach(c => c.classList.remove('active'));
+        
+        this.classList.add('active');
+        document.getElementById(targetTab + '-tab').classList.add('active');
+      });
+    });
+
+    function updateVariant() {
+      const variant = productData.variants[selectedVariantId];
+      
+      if (variant) {
+        // Update hidden form input
+        const hiddenInput = document.querySelector('input[name="id"]');
+        if (hiddenInput) {
+          hiddenInput.value = variant.id;
+        }
+        
+        // Update main product image if variant has a featured image
+        const mainImage = document.querySelector('.bmb-main-image img');
+        
+        if (mainImage && variant.featured_image) {
+          // Update the main src attribute
+          mainImage.src = variant.featured_image;
+          
+          // Update srcset attribute for responsive images
+          const baseUrl = variant.featured_image.split('?')[0]; // Remove existing params
+          mainImage.srcset = `${baseUrl}?v=${Date.now()}&width=352 352w, ${baseUrl}?v=${Date.now()}&width=600 600w`;
+          
+          // Update alt text
+          mainImage.alt = `${productData.handle} - ${variant.color}`;
+        }
+        
+        // Update URL without page reload
+        const url = new URL(window.location);
+        url.searchParams.set('variant', variant.id);
+        window.history.replaceState({}, '', url);
+        
+        // Update personalize button
+        updatePersonalizeButton();
+        
+        // Update availability status if needed
+        updateAvailability(variant);
+      }
+    }
+    
+    function updateAvailability(variant) {
+      // You can add availability messaging here if needed
+      // For example, show "Out of Stock" message
+      const availabilityElement = document.querySelector('.variant-availability');
+      if (availabilityElement) {
+        if (variant.available) {
+          availabilityElement.textContent = '';
+          availabilityElement.style.display = 'none';
+        } else {
+          availabilityElement.textContent = 'Out of Stock';
+          availabilityElement.style.display = 'block';
+          availabilityElement.style.color = '#dc3545';
+        }
+      }
+    }
+
+    function updatePersonalizeButton() {
+      const variant = productData.variants[selectedVariantId];
+      const button = document.getElementById('start-designing-button');
+      
+      if (!variant || !button) return;
+      
+      if (selectedImprintMethod === 'blank') {
+        // For blank items, change button to add to cart or request quote
+        button.textContent = 'Request Quote - Blank Item';
+        button.href = `mailto:sales@brandmybeverage.com?subject=Quote Request - ${productData.handle}&body=I would like a quote for blank (unimprinted) ${productData.handle}, SKU: ${variant.sku}`;
+      } else {
+        // For imprinted items, show design button
+        button.textContent = 'Start Designing Now';
+        // Always use the hardcoded URL for now
+        const url = `/pages/personalize?sku=BMBG7005&variant_id=45788690776322&imprint_method=embroidery&product_handle=16-oz-mixing-glass`;
+        button.href = url;
+      }
+    }
+
+    function updatePricingTable() {
+      console.log('=== updatePricingTable called ===');
+      console.log('selectedImprintMethod:', selectedImprintMethod);
+      console.log('productData.imprintMethods:', productData.imprintMethods);
+      
+      const priceCells = document.querySelectorAll('.price-cell');
+      console.log('Found price cells:', priceCells.length);
+      
+      const selectedMethod = productData.imprintMethods[selectedImprintMethod];
+      console.log('selectedMethod:', selectedMethod);
+      
+      if (!selectedMethod || selectedImprintMethod === 'blank') {
+        console.log('Using base prices only (blank or no method)');
+        // For blank method, show base prices only
+        priceCells.forEach(cell => {
+          const basePrice = parseFloat(cell.dataset.basePrice);
+          cell.textContent = `$${basePrice.toFixed(2)}`;
+        });
+        return;
+      }
+
+      // Parse upcharge tiers if available
+      let upchargeTiers = [];
+      console.log('Raw upchargeTiers:', selectedMethod.upchargeTiers);
+      
+      if (selectedMethod.upchargeTiers) {
+        try {
+          const upchargeData = typeof selectedMethod.upchargeTiers === 'string' 
+            ? JSON.parse(selectedMethod.upchargeTiers) 
+            : selectedMethod.upchargeTiers;
+          upchargeTiers = upchargeData.tiers || [];
+          console.log('Parsed upchargeTiers:', upchargeTiers);
+        } catch (e) {
+          console.warn('Failed to parse upcharge tiers:', e);
+        }
+      } else {
+        console.log('No upcharge tiers found, using empty array');
+        upchargeTiers = [];
+      }
+
+      priceCells.forEach((cell, index) => {
+        const basePrice = parseFloat(cell.dataset.basePrice);
+        const quantity = parseInt(cell.dataset.quantity);
+        
+        console.log(`Cell ${index}: qty=${quantity}, basePrice=${basePrice}`);
+        
+        // Find applicable upcharge for this quantity
+        let upcharge = 0;
+        for (let i = upchargeTiers.length - 1; i >= 0; i--) {
+          if (quantity >= upchargeTiers[i].min_qty) {
+            upcharge = upchargeTiers[i].upcharge;
+            console.log(`  Using upcharge tier: min_qty=${upchargeTiers[i].min_qty}, upcharge=${upcharge}`);
+            break;
+          }
+        }
+        
+        const totalPrice = basePrice + upcharge;
+        console.log(`  Final price: ${basePrice} + ${upcharge} = ${totalPrice}`);
+        cell.textContent = `$${totalPrice.toFixed(2)}`;
+      });
+    }
+
+    function updatePricingDescription() {
+      const pricingDescription = document.getElementById('pricing-description');
+      if (!pricingDescription) return;
+      
+      if (selectedImprintMethod === 'blank') {
+        pricingDescription.textContent = 'Blank item pricing shown below - no decoration or engraving included.';
+      } else {
+        const selectedMethod = productData.imprintMethods[selectedImprintMethod];
+        if (selectedMethod) {
+          pricingDescription.textContent = `${selectedMethod.name} pricing shown below. ${selectedMethod.description || 'Price includes decoration.'} Up to 4 spot colors.`;
+        } else {
+          pricingDescription.textContent = 'Custom imprint pricing shown below. Price includes decoration.';
+        }
+      }
+    }
+
+    // Initialize pricing table on page load
+    console.log('Page loaded, initializing with selectedImprintMethod:', selectedImprintMethod);
+    updatePricingTable();
+    updatePricingDescription();
+    updatePersonalizeButton();
+    
+    // Ensure the first available method tab is marked as active
+    const firstMethodTab = document.querySelector(`.bmb-imprint-tab[data-method="${selectedImprintMethod}"]`);
+    if (firstMethodTab) {
+      document.querySelectorAll('.bmb-imprint-tab').forEach(tab => tab.classList.remove('active'));
+      firstMethodTab.classList.add('active');
+      console.log('Marked first method tab as active:', firstMethodTab);
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "section",
+  "class": "section",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1
+    },
+    {
+      "type": "buy-buttons",
+      "name": "Buy buttons",
+      "limit": 1
+    },
+    {
+      "type": "variant-picker",
+      "name": "Variant picker",
+      "limit": 1
+    },
+    {
+      "type": "share",
+      "name": "Share",
+      "limit": 1
+    },
+    {
+      "type": "collapsible-content",
+      "name": "Collapsible content",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Collapsible content"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "question_mark", "label": "Question mark" }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page"
+        },
+        {
+          "type": "checkbox",
+          "id": "open",
+          "label": "Open by default",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "product-labels",
+      "name": "Product labels",
+      "limit": 1
+    },
+    {
+      "type": "vendor-sku",
+      "name": "Vendor and SKU",
+      "limit": 1
+    },
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "clock", "label": "Clock" },
+            { "value": "price_tag", "label": "Price tag" }
+          ],
+          "default": "clock"
+        },
+        {
+          "type": "richtext",
+          "id": "title",
+          "label": "Message"
+        },
+        {
+          "type": "select",
+          "id": "close",
+          "label": "Close behavior",
+          "options": [
+            { "value": "once", "label": "Once" },
+            { "value": "session", "label": "Session" }
+          ],
+          "default": "once"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_over_media",
+          "label": "Show over media",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "visibility_duration",
+          "min": 1,
+          "max": 10,
+          "step": 1,
+          "unit": "s",
+          "label": "Visibility duration",
+          "default": 4
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background color",
+          "default": "#e4edfa"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#1a66d2"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_best_seller_badge",
+      "label": "Show Best Seller badge",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_need_sooner",
+      "label": "Show 'Need It Sooner?' button",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

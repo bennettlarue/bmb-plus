@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>{{ page.title | default: 'Product Personalization' }}</title>
+  
+  <!-- Artifi SDK -->
+  <script src="https://component.artifi.net/artifi-headless-releases/3.0/Artifi.headless-layout-bretsky.js"></script>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{{ 'artifi-personalization.css' | asset_url }}">
+</head>
+
+<body class="artifi-body-wrapper">
+  <div class="wrapper">
+    <!-- Add to Cart Section -->
+    <div class="cart-row">
+      <button
+        class="add-to-cart-btn"
+        onclick="addToCartDesignHnd()"
+        title="Add to Cart"
+        id="AddToCart"
+      >
+        <svg class="cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M14 2C14 1.44772 13.5523 1 13 1C12.4477 1 12 1.44772 12 2V8.58579L9.70711 6.29289C9.31658 5.90237 8.68342 5.90237 8.29289 6.29289C7.90237 6.68342 7.90237 7.31658 8.29289 7.70711L12.2929 11.7071C12.6834 12.0976 13.3166 12.0976 13.7071 11.7071L17.7071 7.70711C18.0976 7.31658 18.0976 6.68342 17.7071 6.29289C17.3166 5.90237 16.6834 5.90237 16.2929 6.29289L14 8.58579V2ZM1 3C1 2.44772 1.44772 2 2 2H2.47241C3.82526 2 5.01074 2.90547 5.3667 4.21065L5.78295 5.73688L7.7638 13H18.236L20.2152 5.73709C20.3604 5.20423 20.9101 4.88998 21.4429 5.03518C21.9758 5.18038 22.29 5.73006 22.1448 6.26291L20.1657 13.5258C19.9285 14.3962 19.1381 15 18.236 15H8V16C8 16.5523 8.44772 17 9 17H16.5H18C18.5523 17 19 17.4477 19 18C19 18.212 18.934 18.4086 18.8215 18.5704C18.9366 18.8578 19 19.1715 19 19.5C19 20.8807 17.8807 22 16.5 22C15.1193 22 14 20.8807 14 19.5C14 19.3288 14.0172 19.1616 14.05 19H10.95C10.9828 19.1616 11 19.3288 11 19.5C11 20.8807 9.88071 22 8.5 22C7.11929 22 6 20.8807 6 19.5C6 18.863 6.23824 18.2816 6.63048 17.8402C6.23533 17.3321 6 16.6935 6 16V14.1339L3.85342 6.26312L3.43717 4.73688C3.31852 4.30182 2.92336 4 2.47241 4H2C1.44772 4 1 3.55228 1 3ZM16 19.5C16 19.2239 16.2239 19 16.5 19C16.7761 19 17 19.2239 17 19.5C17 19.7761 16.7761 20 16.5 20C16.2239 20 16 19.7761 16 19.5ZM8 19.5C8 19.2239 8.22386 19 8.5 19C8.77614 19 9 19.2239 9 19.5C9 19.7761 8.77614 20 8.5 20C8.22386 20 8 19.7761 8 19.5Z" fill="currentColor"/>
+        </svg>
+        Add to Cart
+      </button>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Tab Navigation -->
+      <div class="tab">
+        <button
+          class="tablinks"
+          onclick="openIframe(event, 'artifi-upload-user-image-tab')"
+          id="uploadTab"
+        >
+          <div>
+            <svg version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 45 45" style="enable-background: new 0 0 45 45" xml:space="preserve" width="40" height="40">
+              <g id="upload">
+                <path id="arrow" class="st0" d="M18.6,36.7h8v-9.9H31l-8.3-9.3l-8.3,9.3h4.3L18.6,36.7z"/>
+                <path id="cloud" class="st1" d="M9.6,37h26.7c0,0,7-2.7,7-9.5c0,0,0-8.1-7-8.3c0,0-3-8.3-10.2-5.1c0,0-2.9-6.4-11.4-3.2 c0,0-5.2,2.1-5.1,7c0,0-7.6,0.3-7.6,8.3C2,26.1,2,35.8,9.6,37z"/>
+              </g>
+            </svg>
+          </div>
+          Upload
+        </button>
+        
+        <button
+          class="tablinks"
+          id="my-gallery-btn"
+          onclick="openIframe(event, 'artifi-my-gallery')"
+        >
+          <div>
+            <svg width="40" height="40" viewBox="0 0 39 33">
+              <defs>
+                <clipPath id="clip-gallery_resized_gray">
+                  <rect width="39" height="33" />
+                </clipPath>
+              </defs>
+              <g id="gallery_resized_gray" data-name="gallery resized gray" clip-path="url(#clip-gallery_resized_gray)">
+                <g id="gallery_-_gray" data-name="gallery - gray" transform="translate(1 1.167)">
+                  <path id="Path_4" data-name="Path 4" d="M704.794,756.45h25.582a.725.725,0,0,1,.724.724v21.247a.724.724,0,0,1-.724.724H704.794a.724.724,0,0,1-.724-.724V757.174A.725.725,0,0,1,704.794,756.45Zm20.568,3.411a1.824,1.824,0,1,0,1.824,1.824A1.824,1.824,0,0,0,725.362,759.861Zm-19.841,12.362,9.221-9.6,4.418,6.459,3.909-3.824,6.584,9.773V757.9H705.522Z" transform="translate(-694.175 -747.813)" fill="#53575a"/>
+                  <path id="Path_5" data-name="Path 5" d="M361.692,465.1,386,457.141a.723.723,0,0,1,.911.464l2.331,7.115h-1.521l-1.959-5.982-22.937,7.514,6.163,18.816,1.163-.381v1.521l-1.4.46a.724.724,0,0,1-.911-.464l-6.613-20.191A.723.723,0,0,1,361.692,465.1Z" transform="translate(-361.191 -457.105)" fill="#53575a"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+          My Gallery
+        </button>
+      </div>
+
+      <div id="show-preview"></div>
+
+      <!-- Product Control Section -->
+      <div class="product-control">
+        <!-- Upload User Image -->
+        <div id="artifi-upload-user-image" data-selector="artifi-upload-user-image" data-image-id="image_1"></div>
+        
+        <!-- Upload Tab Content -->
+        <div id="artifi-upload-user-image-tab" class="my-2 tabview visible" data-image-id="image_1">
+          <div id="artifi-design-updated"></div>
+          <h4 class="panel-heading">Upload Your Artwork</h4>
+          <div id="artifi-upload-container">
+            <div id="artifi-image-upload-drag-image"></div>
+            <div class="separates">OR</div>
+            <div id="artifi-image-upload-browse-image"></div>
+            <div id="artifi-image-upload-image-extensions" class="file-extension"></div>
+            <div id="artifi-image-upload-image-size" class="file-size"></div>
+          </div>
+          <div id="artifi-imprint-color-container">
+            <div id="artifi-remove-all-white"></div>
+            <div id="artifi-graphic-color" data-page-size="50" data-image-id="image_1"></div>
+            <div id="artifi-imprint-color" class="imprint-color" data-shape-type="square"></div>
+            <div id="artifi-graphic-color" data-page-size="50" data-image-id="image_1"></div>
+            <div id="artifi-remove-all-white"></div>
+            <div id="artifi-image-color-detector"></div>
+          </div>
+        </div>
+        
+        <!-- My Gallery -->
+        <div id="artifi-my-gallery" class="my-2 tabview" data-image-id="image_1" data-view-code="" data-add-widget="" data-delete-option="false">
+          <h4 class="panel-heading">My Gallery</h4>
+        </div>
+        
+        <!-- Text Area -->
+        <div id="artifi-text-area" class="my-2 tabview" data-text-id="text_1">
+          <h4 class="panel-heading" id="edit-text-heading">Edit Text</h4>
+        </div>
+        <div class="text-family-and-size">
+          <div id="artifi-text-family" class="text-font-family-dropdown"></div>
+          <div id="artifi-text-size" class="font-dropdown"></div>
+        </div>
+        <div id="artifi-text-color" data-page-size="50"></div>
+
+        <!-- Clipart Families -->
+        <div id="artifi-clipart-families" class="my-2 tabview" data-image-id="image_1" data-view-code="" data-add-widget="" data-clipart-families-visible="true">
+          <h4 class="panel-heading">Add Icon</h4>
+        </div>
+        
+        <!-- Request Proof -->
+        <div id="artifi-request-proof" class="my-2 tabview">
+          <h4 class="panel-heading">Request Proof</h4>
+        </div>
+      </div>
+      
+      <!-- Product Canvas -->
+      <div class="product-canvas">
+        <div id="artifi-zoom" data-zoom-position=""></div>
+        <div id="artifi-editor" data-is-getimage="" data-show-delete-widget-confirmation="true"></div>
+        <div id="artifi-product-views" class="product-view-container" data-carousal-type="scroll" data-carousel-direction="horizontal"></div>
+      </div>
+      
+      <div id="artifi"></div>
+    </div>
+  </div>
+  
+  <!-- Include Pricing Modal -->
+  {% include 'artifi-pricing-modal' %}
+  
+  <!-- Scripts -->
+  <script src="{{ 'artifi-personalization.js' | asset_url }}"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!-- Bulk Pricing Modal -->
+<div id="bulkPricingModal" class="bulk-pricing-modal">
+  <div class="bulk-pricing-modal-content">
+    <span class="bulk-pricing-close">&times;</span>
+    <h2>Select Quantity</h2>
+    <p>Choose your quantity to see bulk pricing discounts:</p>
+    
+    <div class="quantity-selector">
+      <label for="quantityInput">Quantity:</label>
+      <div class="quantity-buttons">
+        <button type="button" class="quantity-btn" id="decreaseQty">-</button>
+        <input type="number" id="quantityInput" class="quantity-input" value="1" min="1">
+        <button type="button" class="quantity-btn" id="increaseQty">+</button>
+      </div>
+    </div>
+    
+    <div class="pricing-info">
+      <h3>Pricing Tiers</h3>
+      <div id="pricingTiers"></div>
+      <div class="current-pricing">
+        <div>Unit Price: $<span id="currentUnitPrice">0.00</span></div>
+        <div>Total: $<span id="currentTotalPrice">0.00</span></div>
+      </div>
+    </div>
+    
+    <button type="button" class="add-to-cart-modal-btn" id="confirmAddToCart">
+      Add to Cart - <span id="modalQuantity">1</span> item(s)
+    </button>
+  </div>
+</div>

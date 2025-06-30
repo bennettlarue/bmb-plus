@@ -1,0 +1,546 @@
+/* Artifi Personalization Styles */
+
+/* Initially hide the imprint color container */
+#artifi-imprint-color-container {
+  display: none;
+}
+
+.main-container {
+  justify-content: left;
+}
+
+.panel-heading {
+  color: #00205c !important;
+  font-weight: 700 !important;
+  text-transform: capitalize;
+}
+
+.truncate-txt {
+  font-size: 35px !important;
+  color: #00205c !important;
+  border: 1px solid #00205c !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 10px 20px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border-radius: 0 10px 10px 10px !important;
+}
+
+.truncate-txt:hover {
+  border-color: #2a4a70 !important;
+}
+
+.truncate-txt:active {
+}
+
+.view-title {
+  background-color: #00205c !important;
+  color: white !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.view-title:hover {
+  background-color: #2a4a70 !important;
+}
+
+.view-title:active {
+  transform: translateY(0) !important;
+}
+
+/* Add to Cart Button - Match Browse File Button Style */
+.add-to-cart-btn {
+  background: white !important;
+  background-color: white !important;
+  color: #00205c !important;
+  border: 2px solid #00205c !important;
+  border-radius: 8px !important;
+  padding: 14px 32px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  min-width: 160px !important;
+  text-align: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+/* Shopping cart icon styling */
+.add-to-cart-btn .cart-icon {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+.add-to-cart-btn:hover {
+  background: #00205c !important;
+  background-color: #00205c !important;
+  color: white !important;
+  border-color: #00205c !important;
+  transform: translateY(-1px) !important;
+}
+
+.add-to-cart-btn:active {
+}
+
+/* Add to Cart Button States */
+.add-to-cart-btn.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.add-to-cart-btn.loading::after {
+  content: " Loading...";
+}
+
+/* Bulk Pricing Modal Styles - Modern Design */
+.bulk-pricing-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.bulk-pricing-modal-content {
+  background-color: #ffffff;
+  margin: 8% auto;
+  padding: 28px;
+  border: none;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Modal Headers - Smaller and Modern */
+.bulk-pricing-modal-content h2 {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  margin: 0 0 8px 0 !important;
+  color: #00205c !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.bulk-pricing-modal-content h3 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  margin: 0 0 12px 0 !important;
+  color: #333 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.bulk-pricing-modal-content p {
+  font-size: 14px !important;
+  color: #666 !important;
+  margin: 0 0 20px 0 !important;
+  line-height: 1.5 !important;
+}
+
+.bulk-pricing-close {
+  color: #999;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 24px;
+  font-weight: normal;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.2s ease;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.bulk-pricing-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.quantity-selector {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quantity-selector label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.quantity-input {
+  width: 70px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 0.2s ease;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #00205c;
+}
+
+.quantity-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantity-btn {
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid #e0e0e0;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.quantity-btn:hover {
+  background: #e3f2fd;
+  border-color: #90caf9;
+}
+
+.quantity-btn:active {
+  transform: translateY(0);
+}
+
+.quantity-btn:disabled {
+  background: #f5f5f5;
+  color: #ccc;
+  cursor: not-allowed;
+  border-color: #e0e0e0;
+}
+
+.pricing-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.pricing-tier {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.pricing-tier:hover {
+  background: #f0f4f8;
+}
+
+.pricing-tier.active {
+  background: #e3f2fd;
+  border-color: #90caf9;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.1);
+}
+
+.current-pricing {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.current-pricing div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.current-pricing div:first-child {
+  color: #666;
+  font-size: 14px;
+}
+
+.current-pricing div:last-child {
+  color: #00205c;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.add-to-cart-modal-btn {
+  background: #00205c;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-to-cart-modal-btn:hover {
+  background: #2a4a70;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-to-cart-modal-btn:active {
+  transform: translateY(0);
+}
+
+.add-to-cart-modal-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* SVG Icon Styles (from inline styles) */
+.st0 {
+  fill: #53575a;
+}
+
+.st1 {
+  fill: #53575a;
+  fill-opacity: 0;
+  stroke: #53575a;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* Browse for File Button Styling - Match Mock Design */
+#artifi-image-upload-browse-image button,
+#artifi-image-upload-browse-image input[type="button"],
+#artifi-image-upload-browse-image .artifi-file-upload-button {
+  background: white !important;
+  background-color: white !important;
+  color: #00205c !important;
+  border: 2px solid #00205c !important;
+  border-radius: 8px !important;
+  padding: 14px 32px !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  min-width: 160px !important;
+  text-align: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+/* Add file upload icon via pseudo-element */
+#artifi-image-upload-browse-image button::before,
+#artifi-image-upload-browse-image input[type="button"]::before,
+#artifi-image-upload-browse-image .artifi-file-upload-button::before {
+  content: "";
+  width: 20px !important;
+  height: 20px !important;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 15H14M12 13V17M13 3H8.2C7.0799 3 6.51984 3 6.09202 3.21799C5.71569 3.40973 5.40973 3.71569 5.21799 4.09202C5 4.51984 5 5.0799 5 6.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.0799 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V9M13 3L19 9M13 3V7.4C13 7.96005 13 8.24008 13.109 8.45399C13.2049 8.64215 13.3578 8.79513 13.546 8.89101C13.7599 9 14.0399 9 14.6 9H19' stroke='%2300205c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  display: inline-block !important;
+}
+
+/* Update icon color on hover */
+#artifi-image-upload-browse-image button:hover::before,
+#artifi-image-upload-browse-image input[type="button"]:hover::before,
+#artifi-image-upload-browse-image .artifi-file-upload-button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 15H14M12 13V17M13 3H8.2C7.0799 3 6.51984 3 6.09202 3.21799C5.71569 3.40973 5.40973 3.71569 5.21799 4.09202C5 4.51984 5 5.0799 5 6.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.0799 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V9M13 3L19 9M13 3V7.4C13 7.96005 13 8.24008 13.109 8.45399C13.2049 8.64215 13.3578 8.79513 13.546 8.89101C13.7599 9 14.0399 9 14.6 9H19' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+}
+
+#artifi-image-upload-browse-image button *,
+#artifi-image-upload-browse-image input[type="button"] *,
+#artifi-image-upload-browse-image .artifi-file-upload-button * {
+  color: #00205c !important;
+}
+
+/* Ensure child elements inherit hover color */
+#artifi-image-upload-browse-image button:hover *,
+#artifi-image-upload-browse-image input[type="button"]:hover *,
+#artifi-image-upload-browse-image .artifi-file-upload-button:hover * {
+  color: white !important;
+}
+
+#artifi-image-upload-browse-image button:hover,
+#artifi-image-upload-browse-image input[type="button"]:hover,
+#artifi-image-upload-browse-image .artifi-file-upload-button:hover {
+  background: #00205c !important;
+  background-color: #00205c !important;
+  color: white !important;
+  border-color: #00205c !important;
+  transform: translateY(-1px) !important;
+}
+
+#artifi-image-upload-browse-image button:active,
+#artifi-image-upload-browse-image input[type="button"]:active,
+#artifi-image-upload-browse-image .artifi-file-upload-button:active {
+  transform: translateY(0) !important;
+}
+
+/* Additional fallback selectors for Artifi SDK elements */
+div[id*="browse"] button,
+div[class*="browse"] button,
+.artifi-browse-button,
+button[class*="browse"],
+input[type="file"] + button,
+input[type="file"] + label {
+  background: white !important;
+  color: #00205c !important;
+  border: 2px solid #00205c !important;
+  border-radius: 8px !important;
+  padding: 14px 32px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+div[id*="browse"] button:hover,
+div[class*="browse"] button:hover,
+.artifi-browse-button:hover,
+button[class*="browse"]:hover,
+input[type="file"] + button:hover,
+input[type="file"] + label:hover {
+  background: #00205c !important;
+  color: white !important;
+  border-color: #00205c !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Sidebar Button Styling - Clean Design */
+.tablinks,
+button.tablinks {
+  background: transparent !important;
+  color: #00205c !important;
+  border: none !important;
+  padding: 16px 12px !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-align: center !important;
+  min-height: 70px !important;
+}
+
+/* Hover effect only for inactive tabs */
+.tablinks:hover:not(.active),
+button.tablinks:hover:not(.active) {
+  background: rgba(0, 32, 92, 0.1) !important;
+  color: #00205c !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Active sidebar button (currently selected) */
+.tablinks.active {
+  background-color: #00205c !important;
+  color: white !important;
+}
+
+/* Sidebar button icons - inherit text color */
+.tablinks svg,
+button.tablinks svg {
+  width: 42px !important;
+  height: 42px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Ensure SVG elements inherit the text color */
+.tablinks svg *,
+button.tablinks svg * {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Default state - blue icons */
+.tablinks svg .st0,
+.tablinks svg .st1,
+button.tablinks svg .st0,
+button.tablinks svg .st1 {
+  fill: #00205c !important;
+  stroke: #00205c !important;
+}
+
+/* Active state - white icons */
+.tablinks.active svg .st0,
+.tablinks.active svg .st1,
+button.tablinks.active svg .st0,
+button.tablinks.active svg .st1 {
+  fill: white !important;
+  stroke: white !important;
+}
+
+.tablinks div,
+button.tablinks div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Sidebar container styling */
+.tab {
+  background: transparent !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
