@@ -1,59 +1,102 @@
+'use client';
+
 import CartModal from 'components/cart/modal';
-import LogoSquare from 'components/logo-square';
-import { getMenu } from 'lib/shopify';
-import { Menu } from 'lib/shopify/types';
 import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Suspense } from 'react';
 import MobileMenu from './mobile-menu';
 import Search, { SearchSkeleton } from './search';
 
-const { SITE_NAME } = process.env;
+interface NavItem {
+  title: string;
+  href: string;
+}
 
-export async function Navbar() {
-  const menu = await getMenu('next-js-frontend-header-menu');
+const navigationItems: NavItem[] = [
+  {
+    title: 'Everyday Drinkware',
+    href: '/collections/everyday-drinkware'
+  },
+  {
+    title: 'Wine & Champagne',
+    href: '/collections/wine-champagne'
+  },
+  {
+    title: 'Beer & Spirits',
+    href: '/collections/beer-spirits'
+  },
+  {
+    title: 'Serveware & Accessories',
+    href: '/collections/serveware-accessories'
+  }
+];
+
+export function Navbar() {
+  const pathname = usePathname();
 
   return (
-    <nav className="relative flex items-center justify-between p-4 lg:px-6">
-      <div className="block flex-none md:hidden">
-        <Suspense fallback={null}>
-          <MobileMenu menu={menu} />
-        </Suspense>
-      </div>
-      <div className="flex w-full items-center">
-        <div className="flex w-full md:w-1/3">
-          <Link
-            href="/"
-            prefetch={true}
-            className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6"
-          >
-            <LogoSquare />
-            <div className="ml-2 flex-none text-sm font-medium uppercase md:hidden lg:block">
-              {SITE_NAME}
+    <nav className="relative bg-white w-full border-b border-black">
+      <div className="max-w-[1536px] mx-auto px-4 lg:px-6">
+        {/* Top Row: Logo, Search, Cart */}
+        <div className="flex items-center justify-between h-[60px]">
+          {/* Mobile Menu */}
+          <div className="block flex-none md:hidden">
+            <Suspense fallback={null}>
+              <MobileMenu menu={[]} />
+            </Suspense>
+          </div>
+
+          <div className='flex w-full max-w-[700px]'>
+          
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link href="/" prefetch={true} className="flex items-center">
+              <Image
+                src="/brand-my-beverage-logo.png"
+                alt="Brand My Beverage"
+                width={220}
+                height={36}
+                className="h-[36px] w-[220px]"
+                priority
+              />
+            </Link>
+          </div>
+
+          {/* Search */}
+          <div className="hidden md:flex justify-center flex-grow mx-8">
+            <div className="w-full max-w-[617px]">
+              <Suspense fallback={<SearchSkeleton />}>
+                <Search />
+              </Suspense>
             </div>
-          </Link>
-          {menu.length ? (
-            <ul className="hidden gap-6 text-sm md:flex md:items-center">
-              {menu.map((item: Menu) => (
-                <li key={item.title}>
-                  <Link
-                    href={item.path}
-                    prefetch={true}
-                    className="text-neutral-500 underline-offset-4 hover:text-black hover:underline dark:text-neutral-400 dark:hover:text-neutral-300"
-                  >
-                    {item.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          </div>
+          </div>
+
+          {/* Cart */}
+          <div className="flex items-center">
+            <CartModal />
+          </div>
         </div>
-        <div className="hidden justify-center md:flex md:w-1/3">
-          <Suspense fallback={<SearchSkeleton />}>
-            <Search />
-          </Suspense>
-        </div>
-        <div className="flex justify-end md:w-1/3">
-          <CartModal />
+
+        {/* Bottom Row: Navigation */}
+        <div className="hidden md:flex items-center justify-start space-x-8 mb-2 ml-2 border-b w-fit">
+          {navigationItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.title}
+                href={item.href}
+                className={`font-barlow font-medium text-[14px] p-2 transition-colors ${
+                  isActive 
+                    ? 'text-[#00205c]' 
+                    : 'text-[#707070] hover:text-[#00205c]'
+                }`}
+              >
+                {item.title}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>

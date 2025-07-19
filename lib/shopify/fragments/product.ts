@@ -56,6 +56,8 @@ const productFragment = /* GraphQL */ `
     }
     tags
     updatedAt
+    productType
+    vendor
     metafields(identifiers: [
       {namespace: "custom", key: "additional_info"},
       {namespace: "custom", key: "quantities"},
