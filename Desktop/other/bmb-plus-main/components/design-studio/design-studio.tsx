@@ -163,7 +163,7 @@ export function DesignStudio({ product }: DesignStudioProps) {
   const selectedElement = designState.elements.find(el => el.id === designState.selectedElementId);
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-white select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
         <div className="flex items-center space-x-4">

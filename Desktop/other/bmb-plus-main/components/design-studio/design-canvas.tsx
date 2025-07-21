@@ -363,7 +363,13 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
         height: element.height,
         transform: `rotate(${element.rotation}deg)`,
         zIndex: element.zIndex,
-        cursor: 'move'
+        cursor: 'move',
+        userSelect: 'none' as const,
+        WebkitUserSelect: 'none' as const,
+        MozUserSelect: 'none' as const,
+        msUserSelect: 'none' as const,
+        WebkitTouchCallout: 'none' as const,
+        WebkitTapHighlightColor: 'transparent'
       }
     };
 
@@ -448,14 +454,20 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div
         ref={canvasRef}
-        className="relative bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200"
+        className="relative bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 select-none"
         style={{
           width: state.canvasWidth,
           height: state.canvasHeight,
           backgroundImage: state.productImageSrc ? `url(${state.productImageSrc})` : undefined,
           backgroundSize: 'contain',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          userSelect: 'none' as const,
+          WebkitUserSelect: 'none' as const,
+          MozUserSelect: 'none' as const,
+          msUserSelect: 'none' as const,
+          WebkitTouchCallout: 'none' as const,
+          WebkitTapHighlightColor: 'transparent'
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
