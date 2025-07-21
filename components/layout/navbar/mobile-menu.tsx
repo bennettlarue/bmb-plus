@@ -6,7 +6,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { Fragment, Suspense, useEffect, useState } from 'react';
 
 import { Menu, X } from 'lucide-react';
-import Search, { SearchSkeleton } from './search';
+import EnhancedSearch from './enhanced-search';
+import { SearchSkeleton } from './search';
 
 interface NavItem {
   title: string;
@@ -96,7 +97,7 @@ export default function MobileMenu({ menu }: { menu: any[] }) {
 
                 <div className="mb-4 w-full">
                   <Suspense fallback={<SearchSkeleton />}>
-                    <Search />
+                    <EnhancedSearch />
                   </Suspense>
                 </div>
                 

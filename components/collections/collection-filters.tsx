@@ -52,14 +52,14 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
   };
 
   return (
-    <div className="flex flex-wrap gap-4 items-center justify-between border-b border-neutral-200 pb-4 dark:border-neutral-700">
+    <div className="flex flex-wrap gap-4 items-center justify-between border-b border-neutral-200 pb-4">
       <div className="flex flex-wrap gap-4">
         {/* Sort */}
         <div className="relative">
           <select
             value={currentFilters.sortBy || 'newest'}
             onChange={(e) => handleFilterChange('sort', e.target.value)}
-            className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+            className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-primary focus:outline-none"
           >
             <option value="newest">Newest</option>
             <option value="price-asc">Price: Low to High</option>
@@ -67,7 +67,7 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
             <option value="title-asc">Name: A to Z</option>
             <option value="title-desc">Name: Z to A</option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700 dark:text-neutral-300">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700">
             <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
@@ -80,7 +80,7 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
             <select
               value={currentFilters.vendor || 'all'}
               onChange={(e) => handleFilterChange('vendor', e.target.value)}
-              className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+              className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-primary focus:outline-none"
             >
               <option value="all">All Brands</option>
               {vendors.map((vendor) => (
@@ -89,7 +89,7 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700 dark:text-neutral-300">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700">
               <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
@@ -102,7 +102,7 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
           <select
             value={currentFilters.capacity || 'all'}
             onChange={(e) => handleFilterChange('capacity', e.target.value)}
-            className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+            className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-primary focus:outline-none"
           >
             <option value="all">All Sizes</option>
             <option value="small">Under 4 oz</option>
@@ -110,7 +110,7 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
             <option value="large">12-20 oz</option>
             <option value="xl">Over 20 oz</option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700 dark:text-neutral-300">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700">
             <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
@@ -119,11 +119,11 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
 
         {/* Price Range */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-neutral-600 dark:text-neutral-400">Price:</span>
+          <span className="text-sm text-neutral-600">Price:</span>
           <select
             value={currentFilters.priceRange ? `${currentFilters.priceRange.min}-${currentFilters.priceRange.max}` : 'all'}
             onChange={(e) => handleFilterChange('price', e.target.value)}
-            className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+            className="appearance-none rounded-lg border border-neutral-300 bg-white px-4 py-2 pr-8 text-sm focus:border-primary focus:outline-none"
           >
             <option value="all">All Prices</option>
             <option value="0-5">Under $5</option>
@@ -132,7 +132,7 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
             <option value="20-50">$20 - $50</option>
             <option value="50-999">Over $50</option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700 dark:text-neutral-300">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-700">
             <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
@@ -144,7 +144,7 @@ export default function CollectionFilters({ products, currentFilters }: Collecti
       {Object.keys(currentFilters).some(key => currentFilters[key] && currentFilters[key] !== 'all') && (
         <button
           onClick={() => router.push(pathname)}
-          className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+          className="text-sm text-primary hover:text-primary/80"
         >
           Clear all filters
         </button>

@@ -45,8 +45,8 @@ export default async function CollectionPage(props: {
     capacity: searchParams?.capacity as string,
     sortBy: searchParams?.sort as any,
     priceRange: searchParams?.price ? {
-      min: parseFloat((searchParams.price as string).split('-')[0]),
-      max: parseFloat((searchParams.price as string).split('-')[1])
+      min: parseFloat((searchParams.price as string).split('-')[0] || '0'),
+      max: parseFloat((searchParams.price as string).split('-')[1] || '999999')
     } : undefined
   };
   

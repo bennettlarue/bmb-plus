@@ -47,17 +47,17 @@ export function BMBFilters() {
   };
 
   return (
-    <div className="mb-6 space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
+    <div className="mb-6 space-y-4 rounded-lg border border-neutral-200 p-4">
       <h3 className="text-lg font-semibold">Filter Products</h3>
       
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Product Type Filter */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+          <label className="mb-2 block text-sm font-medium text-neutral-700">
             Product Type
           </label>
           <select
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none bg-white"
             value={searchParams.get('type') || 'all'}
             onChange={(e) => handleFilterChange('type', e.target.value)}
           >
@@ -72,11 +72,11 @@ export function BMBFilters() {
 
         {/* Vendor Filter */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+          <label className="mb-2 block text-sm font-medium text-neutral-700">
             Brand
           </label>
           <select
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none bg-white"
             value={searchParams.get('vendor') || 'all'}
             onChange={(e) => handleFilterChange('vendor', e.target.value)}
           >
@@ -91,11 +91,11 @@ export function BMBFilters() {
 
         {/* Capacity Filter */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+          <label className="mb-2 block text-sm font-medium text-neutral-700">
             Capacity
           </label>
           <select
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none bg-white"
             value={searchParams.get('capacity') || 'all'}
             onChange={(e) => handleFilterChange('capacity', e.target.value)}
           >
@@ -113,7 +113,7 @@ export function BMBFilters() {
       {(searchParams.get('type') || searchParams.get('vendor') || searchParams.get('capacity')) && (
         <button
           onClick={() => router.push('/search')}
-          className="mt-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+          className="mt-2 text-sm text-primary hover:text-primary/80"
         >
           Clear all filters
         </button>

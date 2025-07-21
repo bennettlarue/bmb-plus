@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Suspense } from 'react';
 import MobileMenu from './mobile-menu';
-import Search, { SearchSkeleton } from './search';
+import EnhancedSearch from './enhanced-search';
+import { SearchSkeleton } from './search';
 
 interface NavItem {
   title: string;
@@ -67,7 +68,7 @@ export function Navbar() {
           <div className="hidden md:flex justify-center flex-grow mx-8">
             <div className="w-full max-w-[617px]">
               <Suspense fallback={<SearchSkeleton />}>
-                <Search />
+                <EnhancedSearch />
               </Suspense>
             </div>
           </div>
