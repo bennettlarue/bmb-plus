@@ -4,6 +4,44 @@ import { useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { DesignState, AnyDesignElement, TextElement, ImageElement, SymbolElement } from 'lib/design-studio/types';
 import { findElementAtPoint } from 'lib/design-studio/utils';
+import { 
+  Star, 
+  Heart, 
+  Check, 
+  ArrowRight, 
+  ArrowUp, 
+  Smile, 
+  ThumbsUp, 
+  Flame 
+} from 'lucide-react';
+
+interface SymbolRendererProps {
+  symbolId: string;
+  color?: string;
+  size: number;
+}
+
+function SymbolRenderer({ symbolId, color, size }: SymbolRendererProps) {
+  const symbolMap = {
+    'star': Star,
+    'heart': Heart,
+    'check': Check,
+    'arrow-right': ArrowRight,
+    'arrow-up': ArrowUp,
+    'smile': Smile,
+    'thumbs-up': ThumbsUp,
+    'fire': Flame
+  };
+
+  const IconComponent = symbolMap[symbolId as keyof typeof symbolMap] || Star;
+  
+  return (
+    <IconComponent 
+      size={size}
+      style={{ color: color || '#000000' }}
+    />
+  );
+}
 
 interface ElementControlsProps {
   element: AnyDesignElement;
@@ -435,13 +473,14 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
               ...selectionStyle,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: Math.min(element.width, element.height) * 0.8,
-              color: symbolElement.color
+              justifyContent: 'center'
             }}
           >
-            {/* For now, just show a placeholder - we'll implement actual symbols later */}
-            ⭐
+            <SymbolRenderer 
+              symbolId={symbolElement.symbolId} 
+              color={symbolElement.color}
+              size={Math.min(element.width, element.height) * 0.8}
+            />
           </div>
         );
 

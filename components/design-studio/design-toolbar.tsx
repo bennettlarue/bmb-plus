@@ -3,6 +3,16 @@
 import { useState, useRef } from 'react';
 import { Tool } from 'lib/design-studio/types';
 import { PhotoIcon, PencilIcon, FaceSmileIcon } from '@heroicons/react/24/outline';
+import { 
+  Star, 
+  Heart, 
+  Check, 
+  ArrowRight, 
+  ArrowUp, 
+  Smile, 
+  ThumbsUp, 
+  Flame 
+} from 'lucide-react';
 
 interface DesignToolbarProps {
   tools: Tool[];
@@ -181,32 +191,53 @@ function TextPanel({ onAddText }: { onAddText: () => void }) {
 }
 
 function SymbolPanel({ onSymbolAdd }: { onSymbolAdd: (symbolId: string, color?: string) => void }) {
+  const [selectedSymbol, setSelectedSymbol] = useState('star');
+  const [selectedColor, setSelectedColor] = useState('#000000');
+
   const symbols = [
-    { id: 'star', name: 'Star', emoji: '⭐', category: 'symbols' },
-    { id: 'heart', name: 'Heart', emoji: '❤️', category: 'symbols' },
-    { id: 'check', name: 'Check', emoji: '✓', category: 'symbols' },
-    { id: 'arrow-right', name: 'Arrow Right', emoji: '→', category: 'arrows' },
-    { id: 'arrow-up', name: 'Arrow Up', emoji: '↑', category: 'arrows' },
-    { id: 'smile', name: 'Smile', emoji: '😊', category: 'symbols' },
-    { id: 'thumbs-up', name: 'Thumbs Up', emoji: '👍', category: 'symbols' },
-    { id: 'fire', name: 'Fire', emoji: '🔥', category: 'symbols' },
+    { id: 'star', name: 'Star', Icon: Star, category: 'symbols' },
+    { id: 'heart', name: 'Heart', Icon: Heart, category: 'symbols' },
+    { id: 'check', name: 'Check', Icon: Check, category: 'symbols' },
+    { id: 'arrow-right', name: 'Arrow Right', Icon: ArrowRight, category: 'arrows' },
+    { id: 'arrow-up', name: 'Arrow Up', Icon: ArrowUp, category: 'arrows' },
+    { id: 'smile', name: 'Smile', Icon: Smile, category: 'symbols' },
+    { id: 'thumbs-up', name: 'Thumbs Up', Icon: ThumbsUp, category: 'symbols' },
+    { id: 'fire', name: 'Fire', Icon: Flame, category: 'symbols' },
   ];
+
+  const handleSymbolClick = (symbolId: string) => {
+    setSelectedSymbol(symbolId);
+    onSymbolAdd(symbolId, selectedColor);
+  };
+
+  const handleColorClick = (color: string) => {
+    setSelectedColor(color);
+    onSymbolAdd(selectedSymbol, color);
+  };
 
   return (
     <div className="p-4">
       <h3 className="text-md font-medium text-gray-900 mb-3">Symbols & Icons</h3>
       
       <div className="grid grid-cols-4 gap-2">
-        {symbols.map((symbol) => (
-          <button
-            key={symbol.id}
-            onClick={() => onSymbolAdd(symbol.id)}
-            className="aspect-square flex items-center justify-center text-2xl bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors"
-            title={symbol.name}
-          >
-            {symbol.emoji}
-          </button>
-        ))}
+        {symbols.map((symbol) => {
+          const IconComponent = symbol.Icon;
+          return (
+            <button
+              key={symbol.id}
+              onClick={() => handleSymbolClick(symbol.id)}
+              className={`aspect-square flex items-center justify-center bg-gray-50 hover:bg-gray-100 border-2 rounded-md transition-colors ${
+                selectedSymbol === symbol.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+              }`}
+              title={symbol.name}
+            >
+              <IconComponent 
+                className="h-6 w-6" 
+                style={{ color: selectedColor }}
+              />
+            </button>
+          );
+        })}
       </div>
 
       <div className="mt-4">
@@ -220,13 +251,24 @@ function SymbolPanel({ onSymbolAdd }: { onSymbolAdd: (symbolId: string, color?: 
           ].map((color) => (
             <button
               key={color}
-              onClick={() => onSymbolAdd('star', color)}
-              className="w-6 h-6 rounded-full border-2 border-gray-300 hover:scale-110 transition-transform"
+              onClick={() => handleColorClick(color)}
+              className={`w-6 h-6 rounded-full border-2 hover:scale-110 transition-transform ${
+                selectedColor === color ? 'border-blue-500' : 'border-gray-300'
+              }`}
               style={{ backgroundColor: color }}
               title={`Use ${color}`}
             />
           ))}
         </div>
+      </div>
+      
+      <div className="mt-4">
+        <button
+          onClick={() => onSymbolAdd(selectedSymbol, selectedColor)}
+          className="w-full bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>Add Symbol</span>
+        </button>
       </div>
     </div>
   );
