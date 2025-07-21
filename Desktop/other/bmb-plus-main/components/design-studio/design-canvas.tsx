@@ -5,6 +5,223 @@ import Image from 'next/image';
 import { DesignState, AnyDesignElement, TextElement, ImageElement, SymbolElement } from 'lib/design-studio/types';
 import { findElementAtPoint } from 'lib/design-studio/utils';
 
+interface ElementControlsProps {
+  element: AnyDesignElement;
+  onResize: (width: number, height: number) => void;
+  onRotate: (rotation: number) => void;
+  dispatch: React.Dispatch<any>;
+}
+
+function ElementControls({ element, onResize, onRotate, dispatch }: ElementControlsProps) {
+  const [isResizing, setIsResizing] = useState(false);
+  const [isRotating, setIsRotating] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [startSize, setStartSize] = useState({ width: 0, height: 0 });
+  const [startRotation, setStartRotation] = useState(0);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent, corner: string) => {
+    e.stopPropagation();
+    setIsResizing(true);
+    
+    // Get the canvas container to calculate relative positions
+    const canvas = (e.target as HTMLElement).closest('.relative');
+    if (!canvas) return;
+    
+    const canvasRect = canvas.getBoundingClientRect();
+    const currentStartPos = { x: e.clientX, y: e.clientY };
+    const currentStartSize = { width: element.width, height: element.height };
+    const currentStartElement = { x: element.x, y: element.y };
+    
+    setStartPos(currentStartPos);
+    setStartSize(currentStartSize);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      // Calculate mouse position relative to canvas
+      const mouseX = e.clientX - canvasRect.left;
+      const mouseY = e.clientY - canvasRect.top;
+      
+      let newWidth = currentStartSize.width;
+      let newHeight = currentStartSize.height;
+      let newX = currentStartElement.x;
+      let newY = currentStartElement.y;
+      
+      // Calculate new size and position based on which corner is being dragged
+      switch (corner) {
+        case 'se': // bottom-right - mouse follows bottom-right corner
+          newWidth = Math.max(20, mouseX - currentStartElement.x);
+          newHeight = Math.max(20, mouseY - currentStartElement.y);
+          break;
+        case 'sw': // bottom-left - mouse follows bottom-left corner
+          newWidth = Math.max(20, (currentStartElement.x + currentStartSize.width) - mouseX);
+          newHeight = Math.max(20, mouseY - currentStartElement.y);
+          newX = Math.min(mouseX, currentStartElement.x + currentStartSize.width - 20);
+          break;
+        case 'ne': // top-right - mouse follows top-right corner
+          newWidth = Math.max(20, mouseX - currentStartElement.x);
+          newHeight = Math.max(20, (currentStartElement.y + currentStartSize.height) - mouseY);
+          newY = Math.min(mouseY, currentStartElement.y + currentStartSize.height - 20);
+          break;
+        case 'nw': // top-left - mouse follows top-left corner
+          newWidth = Math.max(20, (currentStartElement.x + currentStartSize.width) - mouseX);
+          newHeight = Math.max(20, (currentStartElement.y + currentStartSize.height) - mouseY);
+          newX = Math.min(mouseX, currentStartElement.x + currentStartSize.width - 20);
+          newY = Math.min(mouseY, currentStartElement.y + currentStartSize.height - 20);
+          break;
+      }
+      
+      // Update both size and position if needed
+      const updates: any = { width: newWidth, height: newHeight };
+      if (newX !== currentStartElement.x) updates.x = newX;
+      if (newY !== currentStartElement.y) updates.y = newY;
+      
+      onResize(newWidth, newHeight);
+      // We need to also update position for some corners
+      if (updates.x !== undefined || updates.y !== undefined) {
+        // This is a bit of a hack - we should have an onMove callback too
+        dispatch({
+          type: 'UPDATE_ELEMENT',
+          elementId: element.id,
+          updates: updates
+        });
+      }
+    };
+    
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [element, onResize]);
+
+  const handleRotateStart = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsRotating(true);
+    
+    // Get the canvas container to calculate relative positions
+    const canvas = (e.target as HTMLElement).closest('.relative');
+    if (!canvas) return;
+    
+    const canvasRect = canvas.getBoundingClientRect();
+    const elementCenter = {
+      x: element.x + element.width / 2,
+      y: element.y + element.height / 2
+    };
+    
+    // Calculate initial angle from center to mouse
+    const startMouseX = e.clientX - canvasRect.left;
+    const startMouseY = e.clientY - canvasRect.top;
+    const startAngle = Math.atan2(startMouseY - elementCenter.y, startMouseX - elementCenter.x);
+    const startAngleDegrees = (startAngle * 180) / Math.PI;
+    const initialRotation = element.rotation;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      // Calculate current mouse position relative to canvas
+      const mouseX = e.clientX - canvasRect.left;
+      const mouseY = e.clientY - canvasRect.top;
+      
+      // Calculate current angle from center to mouse
+      const currentAngle = Math.atan2(mouseY - elementCenter.y, mouseX - elementCenter.x);
+      const currentAngleDegrees = (currentAngle * 180) / Math.PI;
+      
+      // Calculate the rotation delta and apply it to the initial rotation
+      const angleDelta = currentAngleDegrees - startAngleDegrees;
+      let newRotation = initialRotation + angleDelta;
+      
+      // Normalize rotation to -180 to 180 degrees
+      while (newRotation > 180) newRotation -= 360;
+      while (newRotation < -180) newRotation += 360;
+      
+      onRotate(newRotation);
+    };
+    
+    const handleMouseUp = () => {
+      setIsRotating(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [element, onRotate]);
+
+  const handleStyle = {
+    position: 'absolute' as const,
+    width: '12px',
+    height: '12px',
+    backgroundColor: '#3b82f6',
+    border: '2px solid white',
+    borderRadius: '50%',
+    cursor: 'pointer',
+    zIndex: 1000,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+  };
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: element.x,
+        top: element.y,
+        width: element.width,
+        height: element.height,
+        transform: `rotate(${element.rotation}deg)`,
+        zIndex: element.zIndex + 1,
+        pointerEvents: 'none'
+      }}
+    >
+      {/* Corner resize handles */}
+      <div
+        style={{ ...handleStyle, top: -6, left: -6, cursor: 'nw-resize', pointerEvents: 'auto' }}
+        onMouseDown={(e) => handleResizeStart(e, 'nw')}
+      />
+      <div
+        style={{ ...handleStyle, top: -6, right: -6, cursor: 'ne-resize', pointerEvents: 'auto' }}
+        onMouseDown={(e) => handleResizeStart(e, 'ne')}
+      />
+      <div
+        style={{ ...handleStyle, bottom: -6, left: -6, cursor: 'sw-resize', pointerEvents: 'auto' }}
+        onMouseDown={(e) => handleResizeStart(e, 'sw')}
+      />
+      <div
+        style={{ ...handleStyle, bottom: -6, right: -6, cursor: 'se-resize', pointerEvents: 'auto' }}
+        onMouseDown={(e) => handleResizeStart(e, 'se')}
+      />
+      
+      {/* Rotation handle */}
+      <div
+        style={{
+          ...handleStyle,
+          top: -30,
+          left: '50%',
+          marginLeft: -6,
+          backgroundColor: '#f59e0b',
+          cursor: 'crosshair',
+          pointerEvents: 'auto'
+        }}
+        onMouseDown={handleRotateStart}
+        title="Rotate"
+      />
+      
+      {/* Rotation line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -30,
+          left: '50%',
+          width: '2px',
+          height: '24px',
+          backgroundColor: '#f59e0b',
+          marginLeft: -1,
+          pointerEvents: 'none'
+        }}
+      />
+    </div>
+  );
+}
+
 interface DesignCanvasProps {
   state: DesignState;
   dispatch: React.Dispatch<any>;
@@ -101,11 +318,43 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
     });
   }, []);
 
+  const renderElementWithControls = (element: AnyDesignElement) => {
+    const isSelected = element.id === state.selectedElementId;
+    
+    return (
+      <div key={element.id}>
+        {/* The actual element */}
+        {renderElement(element)}
+        
+        {/* Selection controls - only show for selected element */}
+        {isSelected && (
+          <ElementControls 
+            element={element}
+            dispatch={dispatch}
+            onResize={(width, height) => {
+              dispatch({
+                type: 'UPDATE_ELEMENT',
+                elementId: element.id,
+                updates: { width, height }
+              });
+            }}
+            onRotate={(rotation) => {
+              dispatch({
+                type: 'UPDATE_ELEMENT',
+                elementId: element.id,
+                updates: { rotation }
+              });
+            }}
+          />
+        )}
+      </div>
+    );
+  };
+
   const renderElement = (element: AnyDesignElement) => {
     const isSelected = element.id === state.selectedElementId;
     
     const commonProps = {
-      key: element.id,
       style: {
         position: 'absolute' as const,
         left: element.x,
@@ -119,8 +368,8 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
     };
 
     const selectionStyle = isSelected ? {
-      outline: '2px solid #3b82f6',
-      outlineOffset: '2px'
+      border: '2px dashed #3b82f6',
+      borderRadius: '4px'
     } : {};
 
     switch (element.type) {
@@ -231,7 +480,7 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
         {/* Design elements */}
         {state.elements
           .sort((a, b) => a.zIndex - b.zIndex)
-          .map(renderElement)}
+          .map(renderElementWithControls)}
       </div>
 
       {/* Canvas info */}
