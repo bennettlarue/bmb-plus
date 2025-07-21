@@ -63,16 +63,22 @@ export function createSymbolElement(x: number, y: number, symbolId: string, colo
 export function updateElement(state: DesignState, elementId: string, updates: Partial<AnyDesignElement>): DesignState {
   return {
     ...state,
-    elements: state.elements.map(element =>
-      element.id === elementId ? { ...element, ...updates } as AnyDesignElement : element
-    )
+    elements: {
+      ...state.elements,
+      [state.currentSurface]: state.elements[state.currentSurface].map(element =>
+        element.id === elementId ? { ...element, ...updates } as AnyDesignElement : element
+      )
+    }
   };
 }
 
 export function deleteElement(state: DesignState, elementId: string): DesignState {
   return {
     ...state,
-    elements: state.elements.filter(element => element.id !== elementId),
+    elements: {
+      ...state.elements,
+      [state.currentSurface]: state.elements[state.currentSurface].filter(element => element.id !== elementId)
+    },
     selectedElementId: state.selectedElementId === elementId ? null : state.selectedElementId
   };
 }
@@ -85,12 +91,14 @@ export function selectElement(state: DesignState, elementId: string | null): Des
 }
 
 export function bringToFront(state: DesignState, elementId: string): DesignState {
-  const maxZIndex = Math.max(...state.elements.map(el => el.zIndex));
+  const currentElements = state.elements[state.currentSurface];
+  const maxZIndex = Math.max(...currentElements.map(el => el.zIndex));
   return updateElement(state, elementId, { zIndex: maxZIndex + 1 });
 }
 
 export function sendToBack(state: DesignState, elementId: string): DesignState {
-  const minZIndex = Math.min(...state.elements.map(el => el.zIndex));
+  const currentElements = state.elements[state.currentSurface];
+  const minZIndex = Math.min(...currentElements.map(el => el.zIndex));
   return updateElement(state, elementId, { zIndex: minZIndex - 1 });
 }
 
@@ -109,4 +117,32 @@ export function findElementAtPoint(elements: AnyDesignElement[], x: number, y: n
   return elementsAtPoint.reduce((topElement, current) => 
     current.zIndex > topElement.zIndex ? current : topElement
   );
+}
+
+// Constrain an element position to stay within boundaries  
+export function constrainToBoundaries(
+  x: number, 
+  y: number, 
+  width: number, 
+  height: number, 
+  boundaries: { x: number; y: number; width: number; height: number }[]
+): { x: number; y: number } {
+  if (boundaries.length === 0) {
+    return { x, y };
+  }
+
+  // Use the first boundary as primary constraint
+  const boundary = boundaries[0]!;
+
+  const constrainedX = Math.max(
+    boundary.x,
+    Math.min(boundary.x + boundary.width - width, x)
+  );
+
+  const constrainedY = Math.max(
+    boundary.y,
+    Math.min(boundary.y + boundary.height - height, y)
+  );
+
+  return { x: constrainedX, y: constrainedY };
 }

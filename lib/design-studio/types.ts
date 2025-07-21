@@ -36,11 +36,18 @@ export interface SymbolElement extends DesignElement {
 export type AnyDesignElement = TextElement | ImageElement | SymbolElement;
 
 export interface DesignState {
-  elements: AnyDesignElement[];
+  elements: {
+    front: AnyDesignElement[];
+    back: AnyDesignElement[];
+  };
   selectedElementId: string | null;
+  currentSurface: 'front' | 'back';
   canvasWidth: number;
   canvasHeight: number;
-  productImageSrc: string;
+  productImages: {
+    front: string;
+    back: string;
+  };
 }
 
 export interface Tool {

@@ -3,7 +3,8 @@
 import { useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { DesignState, AnyDesignElement, TextElement, ImageElement, SymbolElement } from 'lib/design-studio/types';
-import { findElementAtPoint } from 'lib/design-studio/utils';
+import { findElementAtPoint, constrainToBoundaries } from 'lib/design-studio/utils';
+import { DesignBoundary } from 'lib/design-studio/boundaries';
 import { 
   Star, 
   Heart, 
@@ -264,6 +265,7 @@ interface DesignCanvasProps {
   state: DesignState;
   dispatch: React.Dispatch<any>;
   currentTool: string;
+  boundaries: DesignBoundary[];
 }
 
 interface DragState {
@@ -275,7 +277,7 @@ interface DragState {
   startY: number;
 }
 
-export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps) {
+export function DesignCanvas({ state, dispatch, currentTool, boundaries }: DesignCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
@@ -298,7 +300,8 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     const { x, y } = getCanvasPosition(e.clientX, e.clientY);
-    const clickedElement = findElementAtPoint(state.elements, x, y);
+    const currentElements = state.elements[state.currentSurface];
+    const clickedElement = findElementAtPoint(currentElements, x, y);
 
     if (clickedElement) {
       dispatch({ type: 'SELECT_ELEMENT', elementId: clickedElement.id });
@@ -318,7 +321,7 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
         dispatch({ type: 'ADD_TEXT', x, y, content: 'Your text here' });
       }
     }
-  }, [state.elements, dispatch, currentTool, getCanvasPosition]);
+  }, [state.elements, state.currentSurface, dispatch, currentTool, getCanvasPosition]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!dragState.isDragging || !dragState.dragElementId) return;
@@ -326,15 +329,19 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
     const deltaX = e.clientX - dragState.lastX;
     const deltaY = e.clientY - dragState.lastY;
 
-    const element = state.elements.find(el => el.id === dragState.dragElementId);
+    const element = state.elements[state.currentSurface].find(el => el.id === dragState.dragElementId);
     if (element) {
+      // Calculate new position
+      const newX = element.x + deltaX;
+      const newY = element.y + deltaY;
+      
+      // Constrain to boundaries if they exist
+      const constrainedPos = constrainToBoundaries(newX, newY, element.width, element.height, boundaries);
+      
       dispatch({
         type: 'UPDATE_ELEMENT',
         elementId: dragState.dragElementId,
-        updates: {
-          x: Math.max(0, Math.min(state.canvasWidth - element.width, element.x + deltaX)),
-          y: Math.max(0, Math.min(state.canvasHeight - element.height, element.y + deltaY))
-        }
+        updates: constrainedPos
       });
     }
 
@@ -343,7 +350,7 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
       lastX: e.clientX,
       lastY: e.clientY
     }));
-  }, [dragState, state.elements, state.canvasWidth, state.canvasHeight, dispatch]);
+  }, [dragState, state.elements, state.currentSurface, boundaries, dispatch]);
 
   const handleMouseUp = useCallback(() => {
     setDragState({
@@ -497,10 +504,6 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
         style={{
           width: state.canvasWidth,
           height: state.canvasHeight,
-          backgroundImage: state.productImageSrc ? `url(${state.productImageSrc})` : undefined,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
           userSelect: 'none' as const,
           WebkitUserSelect: 'none' as const,
           MozUserSelect: 'none' as const,
@@ -514,11 +517,11 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
         onMouseLeave={handleMouseUp}
       >
         {/* Product background image */}
-        {state.productImageSrc && (
+        {state.productImages[state.currentSurface] && (
           <div className="absolute inset-0">
             <Image
-              src={state.productImageSrc}
-              alt="Product background"
+              src={state.productImages[state.currentSurface]}
+              alt={`Product ${state.currentSurface}`}
               fill
               style={{ objectFit: 'contain' }}
               className="pointer-events-none"
@@ -528,8 +531,26 @@ export function DesignCanvas({ state, dispatch, currentTool }: DesignCanvasProps
           </div>
         )}
 
+        {/* Design boundaries */}
+        {boundaries.map((boundary, index) => (
+          <div
+            key={index}
+            className="absolute border-2 border-dashed border-blue-400 pointer-events-none"
+            style={{
+              left: boundary.x,
+              top: boundary.y,
+              width: boundary.width,
+              height: boundary.height,
+            }}
+          >
+            <div className="absolute -top-6 left-0 text-xs font-medium text-blue-600 bg-white px-1 rounded">
+              {boundary.label}
+            </div>
+          </div>
+        ))}
+
         {/* Design elements */}
-        {state.elements
+        {state.elements[state.currentSurface]
           .sort((a, b) => a.zIndex - b.zIndex)
           .map(renderElementWithControls)}
       </div>

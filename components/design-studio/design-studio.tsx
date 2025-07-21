@@ -13,6 +13,7 @@ import {
   bringToFront,
   sendToBack
 } from 'lib/design-studio/utils';
+import { getBoundaryConfig, getPrimaryBoundary, constrainToBoundaries } from 'lib/design-studio/boundaries';
 import { DesignCanvas } from './design-canvas';
 import { DesignToolbar } from './design-toolbar';
 import { PropertyPanel } from './property-panel';
@@ -32,7 +33,8 @@ type DesignAction =
   | { type: 'DELETE_ELEMENT'; elementId: string }
   | { type: 'SELECT_ELEMENT'; elementId: string | null }
   | { type: 'BRING_TO_FRONT'; elementId: string }
-  | { type: 'SEND_TO_BACK'; elementId: string };
+  | { type: 'SEND_TO_BACK'; elementId: string }
+  | { type: 'SWITCH_SURFACE'; surface: 'front' | 'back' };
 
 function designReducer(state: DesignState, action: DesignAction): DesignState {
   switch (action.type) {
@@ -40,7 +42,10 @@ function designReducer(state: DesignState, action: DesignAction): DesignState {
       const textElement = createTextElement(action.x, action.y, action.content);
       return {
         ...state,
-        elements: [...state.elements, textElement],
+        elements: {
+          ...state.elements,
+          [state.currentSurface]: [...state.elements[state.currentSurface], textElement]
+        },
         selectedElementId: textElement.id
       };
     
@@ -48,7 +53,10 @@ function designReducer(state: DesignState, action: DesignAction): DesignState {
       const imageElement = createImageElement(action.x, action.y, action.src, action.width, action.height);
       return {
         ...state,
-        elements: [...state.elements, imageElement],
+        elements: {
+          ...state.elements,
+          [state.currentSurface]: [...state.elements[state.currentSurface], imageElement]
+        },
         selectedElementId: imageElement.id
       };
     
@@ -56,7 +64,10 @@ function designReducer(state: DesignState, action: DesignAction): DesignState {
       const symbolElement = createSymbolElement(action.x, action.y, action.symbolId, action.color);
       return {
         ...state,
-        elements: [...state.elements, symbolElement],
+        elements: {
+          ...state.elements,
+          [state.currentSurface]: [...state.elements[state.currentSurface], symbolElement]
+        },
         selectedElementId: symbolElement.id
       };
     
@@ -75,6 +86,13 @@ function designReducer(state: DesignState, action: DesignAction): DesignState {
     case 'SEND_TO_BACK':
       return sendToBack(state, action.elementId);
     
+    case 'SWITCH_SURFACE':
+      return {
+        ...state,
+        currentSurface: action.surface,
+        selectedElementId: null // Clear selection when switching surfaces
+      };
+    
     default:
       return state;
   }
@@ -86,16 +104,25 @@ interface DesignStudioProps {
 
 export function DesignStudio({ product }: DesignStudioProps) {
   const [currentTool, setCurrentTool] = useState<string>('select');
+  const boundaryConfig = getBoundaryConfig(product.id);
   
   const initialState: DesignState = {
-    elements: [],
+    elements: {
+      front: [],
+      back: []
+    },
     selectedElementId: null,
+    currentSurface: 'front',
     canvasWidth: 600,
     canvasHeight: 600,
-    productImageSrc: product.featuredImage?.url || ''
+    productImages: {
+      front: product.featuredImage?.url || '',
+      back: product.images?.[1]?.url || product.featuredImage?.url || '' // Use second image for back, fallback to front
+    }
   };
 
   const [designState, dispatch] = useReducer(designReducer, initialState);
+  const currentBoundaries = boundaryConfig.surfaces.find(s => s.id === designState.currentSurface)?.boundaries || [];
 
   const tools: Tool[] = [
     {
@@ -123,8 +150,19 @@ export function DesignStudio({ product }: DesignStudioProps) {
   };
 
   const handleAddText = () => {
-    const x = designState.canvasWidth / 2 - 100; // Center horizontally
-    const y = designState.canvasHeight / 2 - 20; // Center vertically
+    const primaryBoundary = getPrimaryBoundary(currentBoundaries);
+    let x, y;
+    
+    if (primaryBoundary) {
+      // Center within the boundary
+      x = primaryBoundary.x + primaryBoundary.width / 2 - 100;
+      y = primaryBoundary.y + primaryBoundary.height / 2 - 20;
+    } else {
+      // Fallback to canvas center
+      x = designState.canvasWidth / 2 - 100;
+      y = designState.canvasHeight / 2 - 20;
+    }
+    
     dispatch({ type: 'ADD_TEXT', x, y, content: 'Your text here' });
     setCurrentTool('select');
   };
@@ -141,9 +179,17 @@ export function DesignStudio({ product }: DesignStudioProps) {
           const scaledWidth = Math.min(maxWidth, img.width);
           const scaledHeight = scaledWidth / aspectRatio;
           
-          // Center the scaled image on the canvas
-          const x = (designState.canvasWidth - scaledWidth) / 2;
-          const y = (designState.canvasHeight - scaledHeight) / 2;
+          // Center the scaled image within the boundary
+          const primaryBoundary = getPrimaryBoundary(currentBoundaries);
+          let x, y;
+          
+          if (primaryBoundary) {
+            x = primaryBoundary.x + (primaryBoundary.width - scaledWidth) / 2;
+            y = primaryBoundary.y + (primaryBoundary.height - scaledHeight) / 2;
+          } else {
+            x = (designState.canvasWidth - scaledWidth) / 2;
+            y = (designState.canvasHeight - scaledHeight) / 2;
+          }
           
           dispatch({ 
             type: 'ADD_IMAGE', 
@@ -162,13 +208,24 @@ export function DesignStudio({ product }: DesignStudioProps) {
   };
 
   const handleSymbolAdd = (symbolId: string, color?: string) => {
-    const x = designState.canvasWidth / 2 - 30; // Center horizontally
-    const y = designState.canvasHeight / 2 - 30; // Center vertically
+    const primaryBoundary = getPrimaryBoundary(currentBoundaries);
+    let x, y;
+    
+    if (primaryBoundary) {
+      // Center within the boundary
+      x = primaryBoundary.x + primaryBoundary.width / 2 - 30;
+      y = primaryBoundary.y + primaryBoundary.height / 2 - 30;
+    } else {
+      // Fallback to canvas center
+      x = designState.canvasWidth / 2 - 30;
+      y = designState.canvasHeight / 2 - 30;
+    }
+    
     dispatch({ type: 'ADD_SYMBOL', x, y, symbolId, color });
     setCurrentTool('select');
   };
 
-  const selectedElement = designState.elements.find(el => el.id === designState.selectedElementId);
+  const selectedElement = designState.elements[designState.currentSurface].find(el => el.id === designState.selectedElementId);
 
   return (
     <div className="h-screen flex flex-col bg-white select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
@@ -182,6 +239,32 @@ export function DesignStudio({ product }: DesignStudioProps) {
           <div className="h-4 w-px bg-gray-300"></div>
           <h1 className="text-xl font-semibold text-gray-900">Design Studio</h1>
           <span className="text-sm text-gray-500">- {product.title}</span>
+        </div>
+        
+        {/* Surface Switcher */}
+        <div className="flex items-center space-x-2">
+          <div className="flex bg-gray-100 rounded-md p-1">
+            <button
+              onClick={() => dispatch({ type: 'SWITCH_SURFACE', surface: 'front' })}
+              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                designState.currentSurface === 'front'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Front
+            </button>
+            <button
+              onClick={() => dispatch({ type: 'SWITCH_SURFACE', surface: 'back' })}
+              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                designState.currentSurface === 'back'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Back
+            </button>
+          </div>
         </div>
         
         <div className="flex items-center space-x-3">
@@ -215,6 +298,7 @@ export function DesignStudio({ product }: DesignStudioProps) {
             state={designState}
             dispatch={dispatch}
             currentTool={currentTool}
+            boundaries={currentBoundaries}
           />
         </div>
 
