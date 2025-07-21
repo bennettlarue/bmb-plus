@@ -135,8 +135,16 @@ export function DesignStudio({ product }: DesignStudioProps) {
       if (e.target?.result) {
         const img = new Image();
         img.onload = () => {
-          const x = designState.canvasWidth / 2 - img.width / 4; // Center, scaled down
-          const y = designState.canvasHeight / 2 - img.height / 4;
+          // Calculate the same scaled dimensions that createImageElement will use
+          const aspectRatio = img.width / img.height;
+          const maxWidth = 300;
+          const scaledWidth = Math.min(maxWidth, img.width);
+          const scaledHeight = scaledWidth / aspectRatio;
+          
+          // Center the scaled image on the canvas
+          const x = (designState.canvasWidth - scaledWidth) / 2;
+          const y = (designState.canvasHeight - scaledHeight) / 2;
+          
           dispatch({ 
             type: 'ADD_IMAGE', 
             x, 
