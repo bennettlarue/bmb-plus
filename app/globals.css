@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+
+@plugin "@tailwindcss/container-queries";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-primary: #00205c;
+  --color-secondary: #707070;
+  --color-accent: #fbb34c;
+  --color-accent-light: #01a0d8;
+  
+  --color-brand-blue: #00205c;
+  --color-brand-blue-light: #01a0d8;
+  --color-brand-orange: #fbb34c;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+  img[loading='lazy'] {
+    clip-path: inset(0.6px);
+  }
+}
+
+a,
+input,
+button {
+  @apply focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+}
